@@ -4,7 +4,7 @@ DRIVER     ?= sqlite3
 DSN        ?= bit.db
 MIGRATIONS_DIR := db/migrations
 
-.PHONY: sqlc migrate-up migrate-down migrate-create build
+.PHONY: sqlc migrate-up migrate-down migrate-create build test
 
 ## Generate Go code from SQL queries via sqlc.
 sqlc:
@@ -27,3 +27,7 @@ migrate-create:
 
 build:
 	go build -o bin/bitd ./cmd/bitd
+
+## Run all tests (requires Docker for testcontainers-backed repository tests).
+test:
+	go test ./... -v
