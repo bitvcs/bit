@@ -1,5 +1,5 @@
-// Package repository adapts sqlc-generated queries to the usecase repository ports.
-package repository
+// Package sqlite adapts sqlc-generated sqlite queries to the usecase repository ports.
+package sqlite
 
 import (
 	"context"

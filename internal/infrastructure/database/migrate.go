@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io/fs"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database"
@@ -12,24 +13,32 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 
-	"github.com/apinprastya/bit/db/migrations"
+	postgresmigrations "github.com/apinprastya/bit/db/migrations/postgres"
+	sqlitemigrations "github.com/apinprastya/bit/db/migrations/sqlite"
 )
 
 func newMigrator(db *sql.DB, dialect string) (*migrate.Migrate, error) {
-	sourceDriver, err := iofs.New(migrations.FS, ".")
-	if err != nil {
-		return nil, err
-	}
+	var (
+		migrationsFS fs.FS
+		dbDriver     database.Driver
+		err          error
+	)
 
-	var dbDriver database.Driver
 	switch dialect {
 	case "sqlite3":
+		migrationsFS = sqlitemigrations.FS
 		dbDriver, err = sqlite.WithInstance(db, &sqlite.Config{})
 	case "postgres":
+		migrationsFS = postgresmigrations.FS
 		dbDriver, err = pgxmigrate.WithInstance(db, &pgxmigrate.Config{})
 	default:
 		return nil, fmt.Errorf("unsupported dialect %q", dialect)
 	}
+	if err != nil {
+		return nil, err
+	}
+
+	sourceDriver, err := iofs.New(migrationsFS, ".")
 	if err != nil {
 		return nil, err
 	}
