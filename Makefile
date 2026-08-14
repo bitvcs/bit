@@ -4,7 +4,9 @@ DRIVER     ?= sqlite3
 DSN        ?= bit.db
 MIGRATIONS_DIR := db/migrations
 
-.PHONY: sqlc migrate-up migrate-down migrate-create build test
+.PHONY: sqlc migrate-up migrate-down migrate-create build test lint
+
+GOLANGCI_LINT_IMAGE ?= docker.io/golangci/golangci-lint:latest
 
 ## Generate Go code from SQL queries via sqlc.
 sqlc:
@@ -31,3 +33,7 @@ build:
 ## Run all tests (requires Docker for testcontainers-backed repository tests).
 test:
 	go test ./... -v
+
+## Lint the code via golangci-lint's Docker image.
+lint:
+	docker run --rm -v $(CURDIR):/app -w /app $(GOLANGCI_LINT_IMAGE) golangci-lint run ./...

@@ -8,10 +8,27 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+  test:
+    runs-on: ubuntu-latest
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-go@v5
         with:
@@ -22,16 +39,31 @@ jobs:
 
       - name: Vet
         run: go vet ./...
+      
+      - name: Run Tests & Generate Reports
+        run: go test -json -coverprofile=coverage.out ./... > report.json
 
-      - name: Test
-        run: go test ./... -v
+      - name: Upload Test and Coverage Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-and-coverage-reports
+          path: |
+            coverage.out
+            report.json
+          retention-days: 1
+
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0 
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: test-and-coverage-reports
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
         env:
