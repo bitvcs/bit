@@ -26,7 +26,7 @@ jobs:
         run: go vet ./...
       
       - name: Run Tests & Generate Reports
-        run: go test -json -coverprofile=coverage.out ./... > report.json
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./... > report.json
 
       - name: Upload Test and Coverage Reports
         uses: actions/upload-artifact@v4
@@ -74,6 +74,13 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@5126f5d8869ff15e4a5df1598db4c5b6ff4f04c7
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.go.tests.reportPaths=report.json
+            -Dsonar.sources=.
+            -Dsonar.tests=.
+            -Dsonar.test.inclusions=**/*_test.go
       - name: SonarQube Quality Gate check
         uses: sonarsource/sonarqube-quality-gate-action@e766c1fbc9be53c61309f7a79e6024cb51b43958
         timeout-minutes: 5
