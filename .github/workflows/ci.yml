@@ -1,0 +1,81 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+      
+      - name: Run Tests & Generate Reports
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./... > report.json
+
+      - name: Upload Test and Coverage Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-and-coverage-reports
+          path: |
+            coverage.out
+            report.json
+          retention-days: 1
+
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: test-and-coverage-reports
+          path: .
+      - name: Verify coverage file
+        run: |
+          if [ -f coverage.out ]; then
+            echo "✅ Coverage file found"
+            echo "Coverage file size: $(wc -c < coverage.out) bytes"
+            echo "Coverage file lines: $(wc -l < coverage.out) lines"
+          else
+            echo "❌ Coverage file not found!"
+            exit 1
+          fi
+      - name: Verify report file
+        run: |
+          if [ -f report.json ]; then
+            echo "✅ Report file found"
+            echo "Report file size: $(wc -c < report.json) bytes"
+            echo "Report file lines: $(wc -l < report.json) lines"
+          else
+            echo "❌ Report file not found!"
+            exit 1
+          fi
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@7a5fffe8e523c40e0c740b6bc2712ab503e52efa
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

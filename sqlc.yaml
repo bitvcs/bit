@@ -1,0 +1,20 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    schema: "db/migrations/sqlite"
+    queries: "db/queries/sqlite"
+    gen:
+      go:
+        package: "sqlc"
+        out: "internal/infrastructure/database/sqlc"
+        emit_json_tags: true
+        emit_interface: true
+  - engine: "postgresql"
+    schema: "db/migrations/postgres"
+    queries: "db/queries/postgres"
+    gen:
+      go:
+        package: "sqlcpg"
+        out: "internal/infrastructure/database/sqlcpg"
+        emit_json_tags: true
+        emit_interface: true
