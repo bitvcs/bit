@@ -71,7 +71,7 @@ jobs:
             exit 1
           fi
       - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@5126f5d8869ff15e4a5df1598db4c5b6ff4f04c7
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -82,7 +82,7 @@ jobs:
             -Dsonar.tests=.
             -Dsonar.test.inclusions=**/*_test.go
       - name: SonarQube Quality Gate check
-        uses: sonarsource/sonarqube-quality-gate-action@e766c1fbc9be53c61309f7a79e6024cb51b43958
+        uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
