@@ -49,7 +49,32 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: test-and-coverage-reports
+      - name: Verify coverage file
+        run: |
+          if [ -f coverage.out ]; then
+            echo "✅ Coverage file found"
+            echo "Coverage file size: $(wc -c < coverage.out) bytes"
+            echo "Coverage file lines: $(wc -l < coverage.out) lines"
+          else
+            echo "❌ Coverage file not found!"
+            exit 1
+          fi
+      - name: Verify report file
+        run: |
+          if [ -f report.json ]; then
+            echo "✅ Report file found"
+            echo "Report file size: $(wc -c < report.json) bytes"
+            echo "Report file lines: $(wc -l < report.json) lines"
+          else
+            echo "❌ Report file not found!"
+            exit 1
+          fi
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube Quality Gate check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
