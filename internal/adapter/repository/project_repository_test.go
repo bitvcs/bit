@@ -10,7 +10,7 @@ import (
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 
 	"github.com/apinprastya/bit/internal/adapter/repository/postgres"
-	sqliteadapter "github.com/apinprastya/bit/internal/adapter/repository/sqlite"
+	sqliterepo "github.com/apinprastya/bit/internal/adapter/repository/sqlite"
 	"github.com/apinprastya/bit/internal/domain"
 	"github.com/apinprastya/bit/internal/infrastructure/database"
 )
@@ -85,7 +85,7 @@ func TestProjectRepository(t *testing.T) {
 				db, err := database.Open("sqlite3", ":memory:")
 				require.NoError(t, err)
 				require.NoError(t, database.MigrateUp(db, "sqlite3"))
-				return sqliteadapter.NewProjectRepository(db), func() {
+				return sqliterepo.NewProjectRepository(db), func() {
 					require.NoError(t, db.Close())
 				}
 			},
