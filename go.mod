@@ -1,4 +1,4 @@
-module github.com/apinprastya/bit
+module github.com/bitvcs/bit
 
 go 1.26.3
 

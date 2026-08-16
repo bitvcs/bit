@@ -6,8 +6,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/apinprastya/bit/internal/domain"
-	"github.com/apinprastya/bit/internal/infrastructure/database/sqlc"
+	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/infrastructure/database/sqlc"
 )
 
 // ProjectRepository implements usecase.ProjectRepository backed by sqlite.
