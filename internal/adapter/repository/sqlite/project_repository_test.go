@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sqliterepo "github.com/apinprastya/bit/internal/adapter/repository/sqlite"
-	"github.com/apinprastya/bit/internal/domain"
-	"github.com/apinprastya/bit/internal/infrastructure/database"
+	sqliterepo "github.com/bitvcs/bit/internal/adapter/repository/sqlite"
+	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/infrastructure/database"
 )
 
 func TestProjectRepositorySQLite(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/apinprastya/bit/internal/domain"
-	"github.com/apinprastya/bit/internal/infrastructure/database/sqlcpg"
+	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/infrastructure/database/sqlcpg"
 )
 
 // ProjectRepository implements usecase.ProjectRepository backed by postgres.

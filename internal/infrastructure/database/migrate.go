@@ -13,8 +13,8 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/sqlite"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
 
-	postgresmigrations "github.com/apinprastya/bit/db/migrations/postgres"
-	sqlitemigrations "github.com/apinprastya/bit/db/migrations/sqlite"
+	postgresmigrations "github.com/bitvcs/bit/db/migrations/postgres"
+	sqlitemigrations "github.com/bitvcs/bit/db/migrations/sqlite"
 )
 
 func newMigrator(db *sql.DB, dialect string) (*migrate.Migrate, error) {

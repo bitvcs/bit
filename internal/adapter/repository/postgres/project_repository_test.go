@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 
-	"github.com/apinprastya/bit/internal/adapter/repository/postgres"
-	"github.com/apinprastya/bit/internal/domain"
-	"github.com/apinprastya/bit/internal/infrastructure/database"
+	"github.com/bitvcs/bit/internal/adapter/repository/postgres"
+	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/infrastructure/database"
 )
 
 var postgresDB *sql.DB

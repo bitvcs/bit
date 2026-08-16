@@ -7,9 +7,8 @@ A next-generation centralized Version Control System engineered for binary-heavy
 - **Language/Tech Stack:** Go (Golang), gRPC, Protobuf, SQLite (`modernc.org/sqlite`), FastCDC, BLAKE3
 - **Architecture Model:** Client-Server Monorepo (`bit` / `bitd`)
 
-See the [Main Idea wiki page](https://github.com/apinprastya/bit/wiki/Main-Idea) for the full design document.
 
 ## License
 
-See [LICENSE](https://github.com/apinprastya/bit/blob/main/LICENSE).
+See [LICENSE](https://github.com/bitvcs/bit/blob/main/LICENSE).
 
