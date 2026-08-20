@@ -3,11 +3,15 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
 )
+
+var nonAlphaNum = regexp.MustCompile(`[^a-z0-9]+`)
 
 type ProjectRepository struct {
 	queries *sqlcSqlite.Queries
@@ -18,7 +22,13 @@ func NewProjectRepository(db *sql.DB) *ProjectRepository {
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) (domain.Project, error) {
+	slug := project.Slug
+	if slug == "" {
+		slug = slugify(project.Name)
+	}
 	row, err := r.queries.CreateProject(ctx, sqlcSqlite.CreateProjectParams{
+		OrgID:       project.OrgID,
+		Slug:        slug,
 		Name:        project.Name,
 		Description: project.Description,
 	})
@@ -55,6 +65,8 @@ func (r *ProjectRepository) Delete(ctx context.Context, id int64) error {
 func toDomainProject(row sqlcSqlite.Project) domain.Project {
 	return domain.Project{
 		ID:          row.ID,
+		OrgID:       row.OrgID,
+		Slug:        row.Slug,
 		Name:        row.Name,
 		Description: row.Description,
 		CreatedAt:   row.CreatedAt,
@@ -68,4 +80,11 @@ func nullTimePtr(t sql.NullTime) *time.Time {
 		return nil
 	}
 	return &t.Time
+}
+
+func slugify(s string) string {
+	s = strings.ToLower(s)
+	s = nonAlphaNum.ReplaceAllString(s, "-")
+	s = strings.Trim(s, "-")
+	return s
 }
