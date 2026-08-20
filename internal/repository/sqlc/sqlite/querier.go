@@ -9,14 +9,14 @@ import (
 )
 
 type Querier interface {
-	CreateNamespace(ctx context.Context, name string) (Namespace, error)
+	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error)
-	DeleteNamespace(ctx context.Context, id int64) error
+	DeleteOrganization(ctx context.Context, id int64) error
 	DeleteProject(ctx context.Context, id int64) error
-	GetNamespace(ctx context.Context, id int64) (Namespace, error)
+	GetOrganization(ctx context.Context, id int64) (Organization, error)
 	GetProject(ctx context.Context, id int64) (Project, error)
-	ListNamespaces(ctx context.Context) ([]Namespace, error)
-	ListProjects(ctx context.Context) ([]Project, error)
+	ListOrganizations(ctx context.Context) ([]Organization, error)
+	ListProjectsByOrgId(ctx context.Context, orgID int64) ([]Project, error)
 }
 
 var _ Querier = (*Queries)(nil)

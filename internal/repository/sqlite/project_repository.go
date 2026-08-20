@@ -36,8 +36,8 @@ func (r *ProjectRepository) Get(ctx context.Context, id int64) (domain.Project, 
 	return toDomainProject(row), nil
 }
 
-func (r *ProjectRepository) List(ctx context.Context) ([]domain.Project, error) {
-	rows, err := r.queries.ListProjects(ctx)
+func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID int64) ([]domain.Project, error) {
+	rows, err := r.queries.ListProjectsByOrgId(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}

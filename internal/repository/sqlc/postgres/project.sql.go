@@ -10,30 +10,40 @@ import (
 )
 
 const createProject = `-- name: CreateProject :one
-INSERT INTO projects (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at, updated_at, deleted_at
+INSERT INTO projects (org_id, slug, name, description) VALUES ($1, $2, $3, $4) RETURNING id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at
 `
 
 type CreateProjectParams struct {
+	OrgID       int64  `json:"org_id"`
+	Slug        string `json:"slug"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
 func (q *Queries) CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error) {
-	row := q.db.QueryRowContext(ctx, createProject, arg.Name, arg.Description)
+	row := q.db.QueryRowContext(ctx, createProject,
+		arg.OrgID,
+		arg.Slug,
+		arg.Name,
+		arg.Description,
+	)
 	var i Project
 	err := row.Scan(
 		&i.ID,
+		&i.OrgID,
+		&i.Slug,
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Deleted,
 		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const deleteProject = `-- name: DeleteProject :exec
-UPDATE projects SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL
+UPDATE projects SET deleted = true, deleted_at = now() WHERE id = $1 AND deleted = false
 `
 
 func (q *Queries) DeleteProject(ctx context.Context, id int64) error {
@@ -42,7 +52,7 @@ func (q *Queries) DeleteProject(ctx context.Context, id int64) error {
 }
 
 const getProject = `-- name: GetProject :one
-SELECT id, name, description, created_at, updated_at, deleted_at FROM projects WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE id = $1 AND deleted = false LIMIT 1
 `
 
 func (q *Queries) GetProject(ctx context.Context, id int64) (Project, error) {
@@ -50,21 +60,24 @@ func (q *Queries) GetProject(ctx context.Context, id int64) (Project, error) {
 	var i Project
 	err := row.Scan(
 		&i.ID,
+		&i.OrgID,
+		&i.Slug,
 		&i.Name,
 		&i.Description,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.Deleted,
 		&i.DeletedAt,
 	)
 	return i, err
 }
 
-const listProjects = `-- name: ListProjects :many
-SELECT id, name, description, created_at, updated_at, deleted_at FROM projects WHERE deleted_at IS NULL ORDER BY id
+const listProjectsByOrgId = `-- name: ListProjectsByOrgId :many
+SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE org_id = $1 AND deleted = false ORDER BY id
 `
 
-func (q *Queries) ListProjects(ctx context.Context) ([]Project, error) {
-	rows, err := q.db.QueryContext(ctx, listProjects)
+func (q *Queries) ListProjectsByOrgId(ctx context.Context, orgID int64) ([]Project, error) {
+	rows, err := q.db.QueryContext(ctx, listProjectsByOrgId, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +87,13 @@ func (q *Queries) ListProjects(ctx context.Context) ([]Project, error) {
 		var i Project
 		if err := rows.Scan(
 			&i.ID,
+			&i.OrgID,
+			&i.Slug,
 			&i.Name,
 			&i.Description,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.Deleted,
 			&i.DeletedAt,
 		); err != nil {
 			return nil, err
