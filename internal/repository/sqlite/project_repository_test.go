@@ -1,4 +1,4 @@
-package sqlite_test
+package sqlite
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sqliterepo "github.com/bitvcs/bit/internal/adapter/repository/sqlite"
+	database "github.com/bitvcs/bit/db"
 	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/infrastructure/database"
 )
 
 func TestProjectRepositorySQLite(t *testing.T) {
@@ -18,7 +17,7 @@ func TestProjectRepositorySQLite(t *testing.T) {
 
 	require.NoError(t, database.MigrateUp(db, "sqlite3"))
 
-	repo := sqliterepo.NewProjectRepository(db)
+	repo := NewProjectRepository(db)
 	ctx := context.Background()
 
 	created, err := repo.Create(ctx, domain.Project{

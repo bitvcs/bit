@@ -3,14 +3,14 @@
 //   sqlc v1.31.1
 // source: project.sql
 
-package sqlcpg
+package sqlite
 
 import (
 	"context"
 )
 
 const createProject = `-- name: CreateProject :one
-INSERT INTO projects (name, description) VALUES ($1, $2) RETURNING id, name, description, created_at, updated_at, deleted_at
+INSERT INTO projects (name, description) VALUES (?, ?) RETURNING id, name, description, created_at, updated_at, deleted_at
 `
 
 type CreateProjectParams struct {
@@ -33,7 +33,7 @@ func (q *Queries) CreateProject(ctx context.Context, arg CreateProjectParams) (P
 }
 
 const deleteProject = `-- name: DeleteProject :exec
-UPDATE projects SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL
+UPDATE projects SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL
 `
 
 func (q *Queries) DeleteProject(ctx context.Context, id int64) error {
@@ -42,7 +42,7 @@ func (q *Queries) DeleteProject(ctx context.Context, id int64) error {
 }
 
 const getProject = `-- name: GetProject :one
-SELECT id, name, description, created_at, updated_at, deleted_at FROM projects WHERE id = $1 AND deleted_at IS NULL LIMIT 1
+SELECT id, name, description, created_at, updated_at, deleted_at FROM projects WHERE id = ? AND deleted_at IS NULL LIMIT 1
 `
 
 func (q *Queries) GetProject(ctx context.Context, id int64) (Project, error) {

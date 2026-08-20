@@ -1,4 +1,3 @@
-// Package sqlite adapts sqlc-generated sqlite queries to the usecase repository ports.
 package sqlite
 
 import (
@@ -7,20 +6,19 @@ import (
 	"time"
 
 	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/infrastructure/database/sqlc"
+	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
 )
 
-// ProjectRepository implements usecase.ProjectRepository backed by sqlite.
 type ProjectRepository struct {
-	queries *sqlc.Queries
+	queries *sqlcSqlite.Queries
 }
 
 func NewProjectRepository(db *sql.DB) *ProjectRepository {
-	return &ProjectRepository{queries: sqlc.New(db)}
+	return &ProjectRepository{queries: sqlcSqlite.New(db)}
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) (domain.Project, error) {
-	row, err := r.queries.CreateProject(ctx, sqlc.CreateProjectParams{
+	row, err := r.queries.CreateProject(ctx, sqlcSqlite.CreateProjectParams{
 		Name:        project.Name,
 		Description: project.Description,
 	})
@@ -54,7 +52,7 @@ func (r *ProjectRepository) Delete(ctx context.Context, id int64) error {
 	return r.queries.DeleteProject(ctx, id)
 }
 
-func toDomainProject(row sqlc.Project) domain.Project {
+func toDomainProject(row sqlcSqlite.Project) domain.Project {
 	return domain.Project{
 		ID:          row.ID,
 		Name:        row.Name,
