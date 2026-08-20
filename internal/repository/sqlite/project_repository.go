@@ -1,26 +1,34 @@
-// Package sqlite adapts sqlc-generated sqlite queries to the usecase repository ports.
 package sqlite
 
 import (
 	"context"
 	"database/sql"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/infrastructure/database/sqlc"
+	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
 )
 
-// ProjectRepository implements usecase.ProjectRepository backed by sqlite.
+var nonAlphaNum = regexp.MustCompile(`[^a-z0-9]+`)
+
 type ProjectRepository struct {
-	queries *sqlc.Queries
+	queries *sqlcSqlite.Queries
 }
 
 func NewProjectRepository(db *sql.DB) *ProjectRepository {
-	return &ProjectRepository{queries: sqlc.New(db)}
+	return &ProjectRepository{queries: sqlcSqlite.New(db)}
 }
 
 func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) (domain.Project, error) {
-	row, err := r.queries.CreateProject(ctx, sqlc.CreateProjectParams{
+	slug := project.Slug
+	if slug == "" {
+		slug = slugify(project.Name)
+	}
+	row, err := r.queries.CreateProject(ctx, sqlcSqlite.CreateProjectParams{
+		OrgID:       project.OrgID,
+		Slug:        slug,
 		Name:        project.Name,
 		Description: project.Description,
 	})
@@ -38,8 +46,8 @@ func (r *ProjectRepository) Get(ctx context.Context, id int64) (domain.Project, 
 	return toDomainProject(row), nil
 }
 
-func (r *ProjectRepository) List(ctx context.Context) ([]domain.Project, error) {
-	rows, err := r.queries.ListProjects(ctx)
+func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID int64) ([]domain.Project, error) {
+	rows, err := r.queries.ListProjectsByOrgId(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,9 +62,11 @@ func (r *ProjectRepository) Delete(ctx context.Context, id int64) error {
 	return r.queries.DeleteProject(ctx, id)
 }
 
-func toDomainProject(row sqlc.Project) domain.Project {
+func toDomainProject(row sqlcSqlite.Project) domain.Project {
 	return domain.Project{
 		ID:          row.ID,
+		OrgID:       row.OrgID,
+		Slug:        row.Slug,
 		Name:        row.Name,
 		Description: row.Description,
 		CreatedAt:   row.CreatedAt,
@@ -70,4 +80,11 @@ func nullTimePtr(t sql.NullTime) *time.Time {
 		return nil
 	}
 	return &t.Time
+}
+
+func slugify(s string) string {
+	s = strings.ToLower(s)
+	s = nonAlphaNum.ReplaceAllString(s, "-")
+	s = strings.Trim(s, "-")
+	return s
 }

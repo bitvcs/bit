@@ -2,26 +2,31 @@
 // versions:
 //   sqlc v1.31.1
 
-package sqlcpg
+package postgres
 
 import (
 	"database/sql"
 	"time"
 )
 
-type Namespace struct {
+type Organization struct {
 	ID        int64        `json:"id"`
+	Slug      string       `json:"slug"`
 	Name      string       `json:"name"`
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
+	Deleted   bool         `json:"deleted"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
 }
 
 type Project struct {
 	ID          int64        `json:"id"`
+	OrgID       int64        `json:"org_id"`
+	Slug        string       `json:"slug"`
 	Name        string       `json:"name"`
 	Description string       `json:"description"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
+	Deleted     bool         `json:"deleted"`
 	DeletedAt   sql.NullTime `json:"deleted_at"`
 }

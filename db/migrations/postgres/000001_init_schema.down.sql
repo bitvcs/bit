@@ -1,2 +1,2 @@
 DROP TABLE projects;
-DROP TABLE namespaces;
+DROP TABLE organizations;

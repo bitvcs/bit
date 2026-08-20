@@ -1,5 +1,4 @@
-// Package database provides the sqlite/postgres connections and golang-migrate based migration runner.
-package database
+package db
 
 import (
 	"database/sql"
@@ -46,7 +45,6 @@ func newMigrator(db *sql.DB, dialect string) (*migrate.Migrate, error) {
 	return migrate.NewWithInstance("iofs", sourceDriver, dialect, dbDriver)
 }
 
-// MigrateUp applies every migration that has not been applied yet, in order.
 func MigrateUp(db *sql.DB, dialect string) error {
 	m, err := newMigrator(db, dialect)
 	if err != nil {
@@ -58,7 +56,6 @@ func MigrateUp(db *sql.DB, dialect string) error {
 	return nil
 }
 
-// MigrateDown reverts every applied migration, from the most recent to the first.
 func MigrateDown(db *sql.DB, dialect string) error {
 	m, err := newMigrator(db, dialect)
 	if err != nil {

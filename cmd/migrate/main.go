@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/bitvcs/bit/internal/infrastructure/database"
+	database "github.com/bitvcs/bit/db"
 )
 
 func main() {

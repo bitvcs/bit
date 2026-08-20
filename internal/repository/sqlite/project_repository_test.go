@@ -1,4 +1,4 @@
-package sqlite_test
+package sqlite
 
 import (
 	"context"
@@ -6,9 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sqliterepo "github.com/bitvcs/bit/internal/adapter/repository/sqlite"
+	database "github.com/bitvcs/bit/db"
 	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/infrastructure/database"
 )
 
 func TestProjectRepositorySQLite(t *testing.T) {
@@ -18,10 +17,11 @@ func TestProjectRepositorySQLite(t *testing.T) {
 
 	require.NoError(t, database.MigrateUp(db, "sqlite3"))
 
-	repo := sqliterepo.NewProjectRepository(db)
+	repo := NewProjectRepository(db)
 	ctx := context.Background()
 
 	created, err := repo.Create(ctx, domain.Project{
+		OrgID:       1,
 		Name:        "project-a",
 		Description: "first project",
 	})
@@ -39,14 +39,14 @@ func TestProjectRepositorySQLite(t *testing.T) {
 	_, err = repo.Get(ctx, 999999)
 	require.Error(t, err)
 
-	_, err = repo.Create(ctx, domain.Project{Name: "project-b", Description: "second"})
+	_, err = repo.Create(ctx, domain.Project{OrgID: 1, Name: "project-b", Description: "second"})
 	require.NoError(t, err)
 
-	projects, err := repo.List(ctx)
+	projects, err := repo.ListByOrgID(ctx, 1)
 	require.NoError(t, err)
 	require.Len(t, projects, 2)
 
-	created2, err := repo.Create(ctx, domain.Project{Name: "project-c", Description: "third"})
+	created2, err := repo.Create(ctx, domain.Project{OrgID: 1, Name: "project-c", Description: "third"})
 	require.NoError(t, err)
 	require.NoError(t, repo.Delete(ctx, created2.ID))
 

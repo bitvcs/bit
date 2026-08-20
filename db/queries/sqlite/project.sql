@@ -1,11 +1,11 @@
 -- name: CreateProject :one
-INSERT INTO projects (name, description) VALUES (?, ?) RETURNING *;
+INSERT INTO projects (org_id, slug, name, description) VALUES (?, ?, ?, ?) RETURNING *;
 
 -- name: GetProject :one
-SELECT * FROM projects WHERE id = ? AND deleted_at IS NULL LIMIT 1;
+SELECT * FROM projects WHERE id = ? AND deleted = false LIMIT 1;
 
--- name: ListProjects :many
-SELECT * FROM projects WHERE deleted_at IS NULL ORDER BY id;
+-- name: ListProjectsByOrgId :many
+SELECT * FROM projects WHERE org_id = ? AND deleted = false ORDER BY id;
 
 -- name: DeleteProject :exec
-UPDATE projects SET deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted_at IS NULL;
+UPDATE projects SET deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ? AND deleted = false;
