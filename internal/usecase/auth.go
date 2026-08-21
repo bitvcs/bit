@@ -15,11 +15,13 @@ const (
 	tokenExpirationMinutes = 30
 )
 
+//go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=auth_mock_test.go -package=usecase
 type userRepository interface {
 	GetByEmail(ctx context.Context, email string) (*domain.User, error)
 	GetByID(ctx context.Context, id int64) (*domain.User, error)
 }
 
+//go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=auth_mock_test.go -package=usecase
 type authRepository interface {
 	SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt int64) error
 	GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (domain.RefreshToken, error)
