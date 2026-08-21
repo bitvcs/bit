@@ -9,6 +9,22 @@ import (
 	"time"
 )
 
+type Group struct {
+	ID          int64          `json:"id"`
+	OrgID       int64          `json:"org_id"`
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	Deleted     bool           `json:"deleted"`
+	DeletedAt   sql.NullTime   `json:"deleted_at"`
+}
+
+type GroupMember struct {
+	GroupID int64 `json:"group_id"`
+	UserID  int64 `json:"user_id"`
+}
+
 type Organization struct {
 	ID        int64        `json:"id"`
 	Slug      string       `json:"slug"`
@@ -17,6 +33,17 @@ type Organization struct {
 	UpdatedAt time.Time    `json:"updated_at"`
 	Deleted   bool         `json:"deleted"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
+}
+
+type PbacRule struct {
+	ID          int64          `json:"id"`
+	CreatedAt   sql.NullTime   `json:"created_at"`
+	UserID      sql.NullInt64  `json:"user_id"`
+	GroupID     sql.NullInt64  `json:"group_id"`
+	OrgID       int64          `json:"org_id"`
+	ProjectID   sql.NullInt64  `json:"project_id"`
+	PathPattern sql.NullString `json:"path_pattern"`
+	Permission  int64          `json:"permission"`
 }
 
 type Project struct {
@@ -29,4 +56,26 @@ type Project struct {
 	UpdatedAt   time.Time    `json:"updated_at"`
 	Deleted     bool         `json:"deleted"`
 	DeletedAt   sql.NullTime `json:"deleted_at"`
+}
+
+type ProjectPathsPermission struct {
+	ID          int64        `json:"id"`
+	ProjectID   int64        `json:"project_id"`
+	PathPattern string       `json:"path_pattern"`
+	IsAllowed   bool         `json:"is_allowed"`
+	CreatedAt   sql.NullTime `json:"created_at"`
+}
+
+type User struct {
+	ID           int64          `json:"id"`
+	Name         string         `json:"name"`
+	Email        string         `json:"email"`
+	Password     string         `json:"password"`
+	PhotoUrl     sql.NullString `json:"photo_url"`
+	IsSuperAdmin bool           `json:"is_super_admin"`
+	IsAdmin      bool           `json:"is_admin"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	Deleted      bool           `json:"deleted"`
+	DeletedAt    sql.NullTime   `json:"deleted_at"`
 }
