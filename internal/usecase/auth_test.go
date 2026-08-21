@@ -28,8 +28,8 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 
 	authRepo.EXPECT().
 		SaveRefreshToken(gomock.Any(), int64(42), gomock.Not(""), gomock.Any()).
-		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt int64) error {
-			require.InDelta(t, time.Now().Add(60*24*time.Hour).Unix(), expiresAt, 5)
+		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt time.Time) error {
+			require.WithinDuration(t, time.Now().Add(60*24*time.Hour), expiresAt, 5*time.Second)
 			return nil
 		})
 
@@ -82,7 +82,7 @@ func TestAuth_LoginWithEmailPassword_SaveRefreshTokenError(t *testing.T) {
 
 func TestAuth_LoginWithRefreshToken(t *testing.T) {
 	ctx := context.Background()
-	stored := domain.RefreshToken{UserID: 7, Token: "old-refresh-token", ExpiresAt: time.Now().Add(time.Hour)}
+	stored := &domain.RefreshToken{UserID: 7, Token: "old-refresh-token", ExpiresAt: time.Now().Add(time.Hour)}
 
 	ctrl := gomock.NewController(t)
 	userRepo := NewMockuserRepository(ctrl)
@@ -98,8 +98,8 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 
 	authRepo.EXPECT().
 		SaveRefreshToken(gomock.Any(), int64(7), gomock.Not("old-refresh-token"), gomock.Any()).
-		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt int64) error {
-			require.InDelta(t, time.Now().Add(60*24*time.Hour).Unix(), expiresAt, 5)
+		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt time.Time) error {
+			require.WithinDuration(t, time.Now().Add(60*24*time.Hour), expiresAt, 5*time.Second)
 			return nil
 		})
 
@@ -123,7 +123,7 @@ func TestAuth_LoginWithRefreshToken_Expired(t *testing.T) {
 
 	authRepo.EXPECT().
 		GetAndDeleteRefreshToken(gomock.Any(), "expired-token").
-		Return(domain.RefreshToken{UserID: 7, ExpiresAt: time.Now().Add(-time.Hour)}, nil)
+		Return(&domain.RefreshToken{UserID: 7, ExpiresAt: time.Now().Add(-time.Hour)}, nil)
 
 	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "expired-token")
 	require.Error(t, err)
@@ -144,7 +144,7 @@ func TestAuth_LoginWithRefreshToken_GetError(t *testing.T) {
 
 	authRepo.EXPECT().
 		GetAndDeleteRefreshToken(gomock.Any(), "unknown-token").
-		Return(domain.RefreshToken{}, wantErr)
+		Return(nil, wantErr)
 
 	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "unknown-token")
 	require.ErrorIs(t, err, wantErr)
@@ -160,7 +160,7 @@ func TestAuth_LoginWithRefreshToken_UserNotFound(t *testing.T) {
 
 	authRepo.EXPECT().
 		GetAndDeleteRefreshToken(gomock.Any(), "valid-token").
-		Return(domain.RefreshToken{UserID: 99, ExpiresAt: time.Now().Add(time.Hour)}, nil)
+		Return(&domain.RefreshToken{UserID: 99, ExpiresAt: time.Now().Add(time.Hour)}, nil)
 
 	userRepo.EXPECT().
 		GetByID(gomock.Any(), int64(99)).

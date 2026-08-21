@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"regexp"
 	"strings"
-	"time"
 
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
@@ -73,13 +72,6 @@ func toDomainProject(row sqlcSqlite.Project) domain.Project {
 		UpdatedAt:   row.UpdatedAt,
 		DeletedAt:   nullTimePtr(row.DeletedAt),
 	}
-}
-
-func nullTimePtr(t sql.NullTime) *time.Time {
-	if !t.Valid {
-		return nil
-	}
-	return &t.Time
 }
 
 func slugify(s string) string {

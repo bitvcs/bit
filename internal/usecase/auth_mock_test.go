@@ -12,6 +12,7 @@ package usecase
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	domain "github.com/bitvcs/bit/internal/domain"
 	gomock "go.uber.org/mock/gomock"
@@ -96,10 +97,10 @@ func (m *MockauthRepository) EXPECT() *MockauthRepositoryMockRecorder {
 }
 
 // GetAndDeleteRefreshToken mocks base method.
-func (m *MockauthRepository) GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (domain.RefreshToken, error) {
+func (m *MockauthRepository) GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (*domain.RefreshToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAndDeleteRefreshToken", ctx, refreshToken)
-	ret0, _ := ret[0].(domain.RefreshToken)
+	ret0, _ := ret[0].(*domain.RefreshToken)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -111,7 +112,7 @@ func (mr *MockauthRepositoryMockRecorder) GetAndDeleteRefreshToken(ctx, refreshT
 }
 
 // SaveRefreshToken mocks base method.
-func (m *MockauthRepository) SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt int64) error {
+func (m *MockauthRepository) SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt time.Time) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveRefreshToken", ctx, userID, refreshToken, expiresAt)
 	ret0, _ := ret[0].(error)

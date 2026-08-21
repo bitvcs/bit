@@ -68,6 +68,29 @@ func (q *Queries) UserGetByEmail(ctx context.Context, email string) (User, error
 	return i, err
 }
 
+const userGetById = `-- name: UserGetById :one
+SELECT id, name, email, password, photo_url, is_super_admin, is_admin, created_at, updated_at, deleted, deleted_at FROM users WHERE id = ? AND deleted = false LIMIT 1
+`
+
+func (q *Queries) UserGetById(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRowContext(ctx, userGetById, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.PhotoUrl,
+		&i.IsSuperAdmin,
+		&i.IsAdmin,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const userUpdatePassword = `-- name: UserUpdatePassword :exec
 UPDATE users SET password = ?
 WHERE id = ? AND deleted = false

@@ -23,8 +23,8 @@ type userRepository interface {
 
 //go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=auth_mock_test.go -package=usecase
 type authRepository interface {
-	SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt int64) error
-	GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (domain.RefreshToken, error)
+	SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt time.Time) error
+	GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (*domain.RefreshToken, error)
 }
 
 type Auth struct {
@@ -80,7 +80,7 @@ func (a *Auth) generateLoginResult(ctx context.Context, user *domain.User) (*dto
 	}
 
 	refreshToken := uuid.New().String()
-	tokenExpiresAt := timeStart.Add(60 * 24 * time.Hour).Unix()
+	tokenExpiresAt := timeStart.Add(60 * 24 * time.Hour)
 	err = a.authRepo.SaveRefreshToken(ctx, user.ID, refreshToken, tokenExpiresAt)
 	if err != nil {
 		return nil, err
