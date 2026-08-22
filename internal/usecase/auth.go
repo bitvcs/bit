@@ -67,12 +67,37 @@ func (a *Auth) LoginWithRefreshToken(ctx context.Context, refreshToken string) (
 	return a.generateLoginResult(ctx, user)
 }
 
+func (a *Auth) ValidateToken(ctx context.Context, tokenString string) (*domain.Claims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &domain.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, domain.NewErrorUser("unexpected signing method")
+		}
+		return []byte(a.secret), nil
+	})
+
+	if err != nil {
+		return nil, domain.NewErrorUser("invalid token")
+	}
+
+	if claims, ok := token.Claims.(*domain.Claims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, domain.NewErrorUser("invalid token")
+	}
+}
+
 func (a *Auth) generateLoginResult(ctx context.Context, user *domain.User) (*dto.LoginResult, error) {
 	timeStart := time.Now()
-	claims := jwt.RegisteredClaims{
-		Subject:   strconv.FormatInt(user.ID, 10),
-		IssuedAt:  jwt.NewNumericDate(timeStart),
-		ExpiresAt: jwt.NewNumericDate(timeStart.Add(tokenExpirationMinutes * time.Minute)),
+	claims := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   strconv.FormatInt(user.ID, 10),
+			IssuedAt:  jwt.NewNumericDate(timeStart),
+			ExpiresAt: jwt.NewNumericDate(timeStart.Add(tokenExpirationMinutes * time.Minute)),
+		},
+		UserID:       user.ID,
+		IsSuperAdmin: user.IsSuperAdmin,
+		IsAdmin:      user.IsAdmin,
+		OrgID:        []int64{},
 	}
 	jwt, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(a.secret))
 	if err != nil {

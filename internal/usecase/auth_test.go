@@ -16,7 +16,7 @@ import (
 
 func TestAuth_LoginWithEmailPassword(t *testing.T) {
 	ctx := context.Background()
-	user := &domain.User{ID: 42, Email: "user@example.com"}
+	user := &domain.User{ID: 42, Email: "user@example.com", IsAdmin: true}
 
 	ctrl := gomock.NewController(t)
 	userRepo := NewMockuserRepository(ctrl)
@@ -43,6 +43,11 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 	claims := parseAccessToken(t, got.AccessToken, "secret")
 	require.Equal(t, strconv.FormatInt(42, 10), claims.Subject)
 	require.InDelta(t, 30*time.Minute.Seconds(), claims.ExpiresAt.Sub(claims.IssuedAt.Time).Seconds(), 2)
+
+	require.Equal(t, int64(42), claims.UserID)
+	require.False(t, claims.IsSuperAdmin)
+	require.True(t, claims.IsAdmin)
+	require.Empty(t, claims.OrgID)
 }
 
 func TestAuth_LoginWithEmailPassword_UserNotFound(t *testing.T) {
@@ -94,7 +99,7 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 
 	userRepo.EXPECT().
 		GetByID(gomock.Any(), int64(7)).
-		Return(&domain.User{ID: 7}, nil)
+		Return(&domain.User{ID: 7, IsSuperAdmin: true}, nil)
 
 	authRepo.EXPECT().
 		SaveRefreshToken(gomock.Any(), int64(7), gomock.Not("old-refresh-token"), gomock.Any()).
@@ -112,6 +117,11 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 
 	claims := parseAccessToken(t, got.AccessToken, "secret")
 	require.Equal(t, strconv.FormatInt(7, 10), claims.Subject)
+
+	require.Equal(t, int64(7), claims.UserID)
+	require.True(t, claims.IsSuperAdmin)
+	require.False(t, claims.IsAdmin)
+	require.Empty(t, claims.OrgID)
 }
 
 func TestAuth_LoginWithRefreshToken_Expired(t *testing.T) {
@@ -170,14 +180,122 @@ func TestAuth_LoginWithRefreshToken_UserNotFound(t *testing.T) {
 	require.ErrorIs(t, err, wantErr)
 }
 
-func parseAccessToken(t *testing.T, token string, secret string) jwt.RegisteredClaims {
+func TestAuth_ValidateToken_Valid(t *testing.T) {
+	ctx := context.Background()
+	want := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   "42",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+		UserID:       42,
+		IsSuperAdmin: true,
+		IsAdmin:      true,
+		OrgID:        []int64{1, 2, 3},
+	}
+
+	token := signToken(t, jwt.SigningMethodHS256, []byte("secret"), want)
+
+	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	require.NoError(t, err)
+
+	require.Equal(t, "42", got.Subject)
+	require.Equal(t, int64(42), got.UserID)
+	require.True(t, got.IsSuperAdmin)
+	require.True(t, got.IsAdmin)
+	require.Equal(t, []int64{1, 2, 3}, got.OrgID)
+	require.WithinDuration(t, want.ExpiresAt.Time, got.ExpiresAt.Time, time.Second)
+}
+
+func TestAuth_ValidateToken_Expired(t *testing.T) {
+	ctx := context.Background()
+	claims := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   "42",
+			IssuedAt:  jwt.NewNumericDate(time.Now().Add(-2 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(-time.Hour)),
+		},
+		UserID: 42,
+	}
+
+	token := signToken(t, jwt.SigningMethodHS256, []byte("secret"), claims)
+
+	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	assertInvalidTokenError(t, err)
+	require.Nil(t, got)
+}
+
+func TestAuth_ValidateToken_WrongSecret(t *testing.T) {
+	ctx := context.Background()
+	claims := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   "42",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+		UserID: 42,
+	}
+
+	token := signToken(t, jwt.SigningMethodHS256, []byte("other-secret"), claims)
+
+	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	assertInvalidTokenError(t, err)
+	require.Nil(t, got)
+}
+
+func TestAuth_ValidateToken_Malformed(t *testing.T) {
+	ctx := context.Background()
+
+	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, "not-a-jwt")
+	assertInvalidTokenError(t, err)
+	require.Nil(t, got)
+}
+
+func TestAuth_ValidateToken_UnexpectedSigningMethod(t *testing.T) {
+	ctx := context.Background()
+	claims := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   "42",
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		},
+		UserID: 42,
+	}
+
+	token, err := jwt.NewWithClaims(jwt.SigningMethodNone, claims).
+		SignedString(jwt.UnsafeAllowNoneSignatureType)
+	require.NoError(t, err)
+
+	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	assertInvalidTokenError(t, err)
+	require.Nil(t, got)
+}
+
+func parseAccessToken(t *testing.T, token string, secret string) *domain.Claims {
 	t.Helper()
 
-	claims := jwt.RegisteredClaims{}
+	claims := domain.Claims{}
 	parsed, err := jwt.ParseWithClaims(token, &claims, func(_ *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})
 	require.NoError(t, err)
 	require.True(t, parsed.Valid)
-	return claims
+	return &claims
+}
+
+func signToken(t *testing.T, method jwt.SigningMethod, key interface{}, claims domain.Claims) string {
+	t.Helper()
+
+	signed, err := jwt.NewWithClaims(method, claims).SignedString(key)
+	require.NoError(t, err)
+	return signed
+}
+
+func assertInvalidTokenError(t *testing.T, err error) {
+	t.Helper()
+
+	var domErr *domain.Error
+	require.ErrorAs(t, err, &domErr)
+	require.Equal(t, 400, domErr.Code)
+	require.Equal(t, "invalid token", domErr.Message)
 }
