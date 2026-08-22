@@ -13,6 +13,7 @@ import (
 	"github.com/bitvcs/bit/internal/http/model"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
 	"github.com/bitvcs/bit/internal/repository/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 	"github.com/bitvcs/bit/internal/usecase"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
@@ -56,7 +57,7 @@ type handlerRegistry struct {
 func (r *handlerRegistry) AuthUsecase() *usecase.Auth { return r.auth }
 func (r *handlerRegistry) UserUsecase() *usecase.User { return r.user }
 
-func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, int64) {
+func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, snow.ID) {
 	t.Helper()
 
 	dbConn, err := database.Open("sqlite3", ":memory:")
@@ -75,11 +76,12 @@ func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, int64) {
 	require.NoError(t, err)
 
 	authRepo := sqlite.NewAuthRepository(dbConn)
+	node, _ := snow.NewNode(1)
 	reg := &handlerRegistry{
 		auth: usecase.NewAuth("test-secret", sqlite.NewUserRepository(dbConn), authRepo),
-		user: usecase.NewUser(),
+		user: usecase.NewUser(node),
 	}
-	return NewHandler(reg), authRepo, userID
+	return NewHandler(reg), authRepo, snow.ID(userID)
 }
 
 func TestNewHandler(t *testing.T) {

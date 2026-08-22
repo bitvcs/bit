@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/bitvcs/bit/internal/snow"
+)
 
 const (
 	PermissionRead  = 1 << iota // 1
@@ -22,7 +26,7 @@ type PBACRule struct {
 
 type ProjectPathPermission struct {
 	ID          int64     `json:"id"`
-	ProjectID   int64     `json:"project_id"`
+	ProjectID   snow.ID   `json:"project_id"`
 	PathPattern string    `json:"path_pattern"`
 	IsAllowed   bool      `json:"is_allowed"`
 	CreatedAt   time.Time `json:"created_at"`

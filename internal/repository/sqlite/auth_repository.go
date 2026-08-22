@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 type Auth struct {
@@ -17,9 +18,9 @@ func NewAuthRepository(db *sql.DB) *Auth {
 	return &Auth{queries: sqlcSqlite.New(db)}
 }
 
-func (a *Auth) SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt time.Time) error {
+func (a *Auth) SaveRefreshToken(ctx context.Context, userID snow.ID, refreshToken string, expiresAt time.Time) error {
 	_, err := a.queries.RefreshTokenCreate(ctx, sqlcSqlite.RefreshTokenCreateParams{
-		UserID:    userID,
+		UserID:    userID.Int64(),
 		Token:     refreshToken,
 		ExpiresAt: expiresAt,
 	})
@@ -37,7 +38,7 @@ func (a *Auth) GetAndDeleteRefreshToken(ctx context.Context, refreshToken string
 func toDomainRefreshToken(row sqlcSqlite.RefreshToken) *domain.RefreshToken {
 	return &domain.RefreshToken{
 		ID:        row.ID,
-		UserID:    row.UserID,
+		UserID:    snow.ID(row.UserID),
 		Token:     row.Token,
 		ExpiresAt: row.ExpiresAt,
 		CreatedAt: row.CreatedAt,

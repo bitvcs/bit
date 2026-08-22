@@ -1,9 +1,13 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/bitvcs/bit/internal/snow"
+)
 
 type User struct {
-	ID           int64      `json:"id"`
+	ID           snow.ID    `json:"id"`
 	Name         string     `json:"name"`
 	Email        string     `json:"email"`
 	Password     string     `json:"password"`
@@ -17,20 +21,20 @@ type User struct {
 }
 
 type Group struct {
-	ID          int64      `json:"id"`
-	OrgID       int64      `json:"org_id"`
+	ID          snow.ID    `json:"id"`
+	OrgID       snow.ID    `json:"org_id"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	Deleted     bool       `json:"deleted"`
 	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
-	MemberIDs   []int64    `json:"member_ids"`
+	MemberIDs   []snow.ID  `json:"member_ids"`
 }
 
 type RefreshToken struct {
 	ID        int64     `json:"id"`
-	UserID    int64     `json:"user_id"`
+	UserID    snow.ID   `json:"user_id"`
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expires_at"`
 	CreatedAt time.Time `json:"created_at"`

@@ -1,5 +1,5 @@
 -- name: CreateOrganization :one
-INSERT INTO organizations (name, slug) VALUES (?, ?) RETURNING *;
+INSERT INTO organizations (id, name, slug) VALUES (?, ?, ?) RETURNING *;
 
 -- name: GetOrganization :one
 SELECT * FROM organizations WHERE id = ? AND deleted = false LIMIT 1;

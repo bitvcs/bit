@@ -12,11 +12,12 @@ import (
 	"go.uber.org/mock/gomock"
 
 	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 func TestAuth_LoginWithEmailPassword(t *testing.T) {
 	ctx := context.Background()
-	user := &domain.User{ID: 42, Email: "user@example.com", IsAdmin: true}
+	user := &domain.User{ID: snow.ID(42), Email: "user@example.com", IsAdmin: true}
 
 	ctrl := gomock.NewController(t)
 	userRepo := NewMockuserRepository(ctrl)
@@ -27,8 +28,8 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 		Return(user, nil)
 
 	authRepo.EXPECT().
-		SaveRefreshToken(gomock.Any(), int64(42), gomock.Not(""), gomock.Any()).
-		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt time.Time) error {
+		SaveRefreshToken(gomock.Any(), snow.ID(42), gomock.Not(""), gomock.Any()).
+		DoAndReturn(func(_ context.Context, _ snow.ID, _ string, expiresAt time.Time) error {
 			require.WithinDuration(t, time.Now().Add(60*24*time.Hour), expiresAt, 5*time.Second)
 			return nil
 		})
@@ -41,10 +42,10 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 	require.NotEmpty(t, got.AccessToken)
 
 	claims := parseAccessToken(t, got.AccessToken, "secret")
-	require.Equal(t, strconv.FormatInt(42, 10), claims.Subject)
+	require.Equal(t, snow.ID(42).Base36(), claims.Subject)
 	require.InDelta(t, 30*time.Minute.Seconds(), claims.ExpiresAt.Sub(claims.IssuedAt.Time).Seconds(), 2)
 
-	require.Equal(t, int64(42), claims.UserID)
+	require.Equal(t, snow.ID(42), claims.UserID)
 	require.False(t, claims.IsSuperAdmin)
 	require.True(t, claims.IsAdmin)
 	require.Empty(t, claims.OrgID)
@@ -78,7 +79,7 @@ func TestAuth_LoginWithEmailPassword_SaveRefreshTokenError(t *testing.T) {
 		GetByEmail(gomock.Any(), "user@example.com").
 		Return(&domain.User{ID: 1}, nil)
 	authRepo.EXPECT().
-		SaveRefreshToken(gomock.Any(), int64(1), gomock.Any(), gomock.Any()).
+		SaveRefreshToken(gomock.Any(), snow.ID(1), gomock.Any(), gomock.Any()).
 		Return(wantErr)
 
 	_, err := NewAuth("secret", userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
@@ -98,12 +99,12 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 		Return(stored, nil)
 
 	userRepo.EXPECT().
-		GetByID(gomock.Any(), int64(7)).
+		GetByID(gomock.Any(), snow.ID(7)).
 		Return(&domain.User{ID: 7, IsSuperAdmin: true}, nil)
 
 	authRepo.EXPECT().
-		SaveRefreshToken(gomock.Any(), int64(7), gomock.Not("old-refresh-token"), gomock.Any()).
-		DoAndReturn(func(_ context.Context, _ int64, _ string, expiresAt time.Time) error {
+		SaveRefreshToken(gomock.Any(), snow.ID(7), gomock.Not("old-refresh-token"), gomock.Any()).
+		DoAndReturn(func(_ context.Context, _ snow.ID, _ string, expiresAt time.Time) error {
 			require.WithinDuration(t, time.Now().Add(60*24*time.Hour), expiresAt, 5*time.Second)
 			return nil
 		})
@@ -118,7 +119,7 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 	claims := parseAccessToken(t, got.AccessToken, "secret")
 	require.Equal(t, strconv.FormatInt(7, 10), claims.Subject)
 
-	require.Equal(t, int64(7), claims.UserID)
+	require.Equal(t, snow.ID(7), claims.UserID)
 	require.True(t, claims.IsSuperAdmin)
 	require.False(t, claims.IsAdmin)
 	require.Empty(t, claims.OrgID)
@@ -173,7 +174,7 @@ func TestAuth_LoginWithRefreshToken_UserNotFound(t *testing.T) {
 		Return(&domain.RefreshToken{UserID: 99, ExpiresAt: time.Now().Add(time.Hour)}, nil)
 
 	userRepo.EXPECT().
-		GetByID(gomock.Any(), int64(99)).
+		GetByID(gomock.Any(), snow.ID(99)).
 		Return(nil, wantErr)
 
 	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "valid-token")
@@ -191,7 +192,7 @@ func TestAuth_ValidateToken_Valid(t *testing.T) {
 		UserID:       42,
 		IsSuperAdmin: true,
 		IsAdmin:      true,
-		OrgID:        []int64{1, 2, 3},
+		OrgID:        []snow.ID{snow.ID(1), snow.ID(2), snow.ID(3)},
 	}
 
 	token := signToken(t, jwt.SigningMethodHS256, []byte("secret"), want)
@@ -200,10 +201,10 @@ func TestAuth_ValidateToken_Valid(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, "42", got.Subject)
-	require.Equal(t, int64(42), got.UserID)
+	require.Equal(t, snow.ID(42), got.UserID)
 	require.True(t, got.IsSuperAdmin)
 	require.True(t, got.IsAdmin)
-	require.Equal(t, []int64{1, 2, 3}, got.OrgID)
+	require.Equal(t, []snow.ID{snow.ID(1), snow.ID(2), snow.ID(3)}, got.OrgID)
 	require.WithinDuration(t, want.ExpiresAt.Time, got.ExpiresAt.Time, time.Second)
 }
 

@@ -15,6 +15,7 @@ import (
 	"github.com/bitvcs/bit/internal/config"
 	"github.com/bitvcs/bit/internal/http/api"
 	"github.com/bitvcs/bit/internal/repository/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 	"github.com/bitvcs/bit/internal/usecase"
 	_ "modernc.org/sqlite"
 )
@@ -40,9 +41,13 @@ func main() {
 	authRepo := sqlite.NewAuthRepository(dbConn)
 	userRepo := sqlite.NewUserRepository(dbConn)
 
+	snowUser, err := snow.NewNode(cfg.SnowflakeNodeID)
+	if err != nil {
+		panic(err)
+	}
 	reg := &Registry{
 		authUsecase: usecase.NewAuth(cfg.JWTKey, userRepo, authRepo),
-		userUsecase: usecase.NewUser(),
+		userUsecase: usecase.NewUser(snowUser),
 	}
 
 	apiApp := api.NewAPI(reg)

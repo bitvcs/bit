@@ -7,5 +7,5 @@ import (
 )
 
 func TestNewUser(t *testing.T) {
-	require.NotNil(t, NewUser())
+	require.NotNil(t, NewUser(nil))
 }

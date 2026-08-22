@@ -1,6 +1,6 @@
 -- name: UserCreate :one
-INSERT INTO users (name, email, password, photo_url, is_admin) 
-VALUES (?, ?, ?, ?, ?) RETURNING id;
+INSERT INTO users (id, name, email, password, photo_url, is_admin) 
+VALUES (?, ?, ?, ?, ?, ?) RETURNING id;
 
 -- name: UserGetByEmail :one
 SELECT * FROM users WHERE email = ? AND deleted = false LIMIT 1;

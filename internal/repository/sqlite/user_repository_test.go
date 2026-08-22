@@ -10,6 +10,7 @@ import (
 	database "github.com/bitvcs/bit/db"
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 func newSQLiteTestDB(t *testing.T) (*sql.DB, *sqlcSqlite.Queries) {
@@ -24,10 +25,13 @@ func newSQLiteTestDB(t *testing.T) (*sql.DB, *sqlcSqlite.Queries) {
 	return db, sqlcSqlite.New(db)
 }
 
-func seedUser(t *testing.T, q *sqlcSqlite.Queries, name, email string, photoUrl sql.NullString) int64 {
+func seedUser(t *testing.T, q *sqlcSqlite.Queries, name, email string, photoUrl sql.NullString) snow.ID {
 	t.Helper()
 
+	node, err := snow.NewNode(1)
+	require.NoError(t, err)
 	id, err := q.UserCreate(context.Background(), sqlcSqlite.UserCreateParams{
+		ID:       node.Generate().Int64(),
 		Name:     name,
 		Email:    email,
 		Password: "hashed-password",
@@ -35,7 +39,7 @@ func seedUser(t *testing.T, q *sqlcSqlite.Queries, name, email string, photoUrl 
 		IsAdmin:  true,
 	})
 	require.NoError(t, err)
-	return id
+	return snow.ID(id)
 }
 
 func requireRecordNotFound(t *testing.T, err error) {
@@ -114,7 +118,7 @@ func TestUserRepositorySQLite_DeletedUserIsNotReturned(t *testing.T) {
 	repo := NewUserRepository(db)
 
 	id := seedUser(t, q, "dave", "dave@example.com", sql.NullString{})
-	require.NoError(t, q.UserDeleteByID(ctx, id))
+	require.NoError(t, q.UserDeleteByID(ctx, id.Int64()))
 
 	_, err := repo.GetByEmail(ctx, "dave@example.com")
 	requireRecordNotFound(t, err)

@@ -14,6 +14,7 @@ import (
 	"github.com/bitvcs/bit/internal/http/model"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
 	"github.com/bitvcs/bit/internal/repository/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 	"github.com/bitvcs/bit/internal/usecase"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
@@ -47,9 +48,10 @@ func TestAPIRoutes(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	node, _ := snow.NewNode(1)
 	reg := &testRegistry{
 		auth: usecase.NewAuth("test-secret", sqlite.NewUserRepository(dbConn), sqlite.NewAuthRepository(dbConn)),
-		user: usecase.NewUser(),
+		user: usecase.NewUser(node),
 	}
 
 	container := NewAPI(reg).SetupRoute()
@@ -72,7 +74,7 @@ func TestAPIRoutes(t *testing.T) {
 		require.NotEmpty(t, login.RefreshToken)
 
 		parsed := parseLoginAccessToken(t, login.AccessToken, "test-secret")
-		require.Equal(t, userID, parsed.UserID)
+		require.Equal(t, snow.ID(userID), parsed.UserID)
 	})
 
 	t.Run("login unknown user", func(t *testing.T) {

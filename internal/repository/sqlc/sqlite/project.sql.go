@@ -10,10 +10,11 @@ import (
 )
 
 const createProject = `-- name: CreateProject :one
-INSERT INTO projects (org_id, slug, name, description) VALUES (?, ?, ?, ?) RETURNING id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at
+INSERT INTO projects (id, org_id, slug, name, description) VALUES (?, ?, ?, ?, ?) RETURNING id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at
 `
 
 type CreateProjectParams struct {
+	ID          int64  `json:"id"`
 	OrgID       int64  `json:"org_id"`
 	Slug        string `json:"slug"`
 	Name        string `json:"name"`
@@ -22,6 +23,7 @@ type CreateProjectParams struct {
 
 func (q *Queries) CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error) {
 	row := q.db.QueryRowContext(ctx, createProject,
+		arg.ID,
 		arg.OrgID,
 		arg.Slug,
 		arg.Name,
