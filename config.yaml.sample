@@ -1,0 +1,5 @@
+SERVER_ADDRESS: 0.0.0.0
+SERVER_PORT: 6745
+DATABASE_DSN: sqlite://bit.db
+JWT_KEY: secret
+LOG_LEVEL: debug

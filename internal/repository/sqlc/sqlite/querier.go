@@ -17,6 +17,14 @@ type Querier interface {
 	GetProject(ctx context.Context, id int64) (Project, error)
 	ListOrganizations(ctx context.Context) ([]Organization, error)
 	ListProjectsByOrgId(ctx context.Context, orgID int64) ([]Project, error)
+	RefreshTokenCreate(ctx context.Context, arg RefreshTokenCreateParams) (int64, error)
+	RefreshTokenDeleteByToken(ctx context.Context, token string) (RefreshToken, error)
+	UserCreate(ctx context.Context, arg UserCreateParams) (int64, error)
+	UserDeleteByID(ctx context.Context, id int64) error
+	UserGetByEmail(ctx context.Context, email string) (User, error)
+	UserGetById(ctx context.Context, id int64) (User, error)
+	UserUpdatePassword(ctx context.Context, arg UserUpdatePasswordParams) error
+	UserUpdateProfile(ctx context.Context, arg UserUpdateProfileParams) error
 }
 
 var _ Querier = (*Queries)(nil)

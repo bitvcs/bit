@@ -4,13 +4,17 @@ DRIVER     ?= sqlite3
 DSN        ?= bit.db
 MIGRATIONS_DIR := db/migrations
 
-.PHONY: sqlc migrate-up migrate-down migrate-create build test lint
+.PHONY: sqlc mock migrate-up migrate-down migrate-create build test lint
 
 GOLANGCI_LINT_IMAGE ?= docker.io/golangci/golangci-lint:latest
 
 ## Generate Go code from SQL queries via sqlc.
 sqlc:
 	$(SQLC) generate
+
+## Regenerate all gomock mocks declared via //go:generate directives.
+mock:
+	go generate ./...
 
 ## Apply all pending migrations. Override DRIVER=postgres DSN=... for postgres.
 migrate-up:
