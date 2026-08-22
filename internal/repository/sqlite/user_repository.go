@@ -7,6 +7,7 @@ import (
 
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 type User struct {
@@ -28,8 +29,8 @@ func (a *User) GetByEmail(ctx context.Context, email string) (*domain.User, erro
 	return toDomainUser(user), nil
 }
 
-func (a *User) GetByID(ctx context.Context, id int64) (*domain.User, error) {
-	user, err := a.queries.UserGetById(ctx, id)
+func (a *User) GetByID(ctx context.Context, id snow.ID) (*domain.User, error) {
+	user, err := a.queries.UserGetById(ctx, id.Int64())
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, domain.NewErrorRecordNotFound()
@@ -41,7 +42,7 @@ func (a *User) GetByID(ctx context.Context, id int64) (*domain.User, error) {
 
 func toDomainUser(row sqlcSqlite.User) *domain.User {
 	user := domain.User{
-		ID:           row.ID,
+		ID:           snow.ID(row.ID),
 		Name:         row.Name,
 		Email:        row.Email,
 		Password:     row.Password,

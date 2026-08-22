@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	DatabaseDSN   string `mapstructure:"DATABASE_DSN"`
-	ServerAddress string `mapstructure:"SERVER_ADDRESS"`
-	ServerPort    int    `mapstructure:"SERVER_PORT"`
-	JWTKey        string `mapstructure:"JWT_KEY"`
-	LogLevel      string `mapstructure:"LOG_LEVEL"`
+	DatabaseDSN     string `mapstructure:"DATABASE_DSN"`
+	ServerAddress   string `mapstructure:"SERVER_ADDRESS"`
+	ServerPort      int    `mapstructure:"SERVER_PORT"`
+	JWTKey          string `mapstructure:"JWT_KEY"`
+	LogLevel        string `mapstructure:"LOG_LEVEL"`
+	SnowflakeNodeID int64  `mapstructure:"SNOWFLAKE_NODE_ID"`
 }
 
 func LoadConfig() (*Config, error) {

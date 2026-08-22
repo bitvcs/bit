@@ -8,6 +8,7 @@ import (
 
 	"github.com/bitvcs/bit/internal/domain"
 	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 var nonAlphaNum = regexp.MustCompile(`[^a-z0-9]+`)
@@ -26,7 +27,7 @@ func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) 
 		slug = slugify(project.Name)
 	}
 	row, err := r.queries.CreateProject(ctx, sqlcSqlite.CreateProjectParams{
-		OrgID:       project.OrgID,
+		OrgID:       project.OrgID.Int64(),
 		Slug:        slug,
 		Name:        project.Name,
 		Description: project.Description,
@@ -37,16 +38,16 @@ func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) 
 	return toDomainProject(row), nil
 }
 
-func (r *ProjectRepository) Get(ctx context.Context, id int64) (domain.Project, error) {
-	row, err := r.queries.GetProject(ctx, id)
+func (r *ProjectRepository) Get(ctx context.Context, id snow.ID) (domain.Project, error) {
+	row, err := r.queries.GetProject(ctx, id.Int64())
 	if err != nil {
 		return domain.Project{}, err
 	}
 	return toDomainProject(row), nil
 }
 
-func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID int64) ([]domain.Project, error) {
-	rows, err := r.queries.ListProjectsByOrgId(ctx, orgID)
+func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID snow.ID) ([]domain.Project, error) {
+	rows, err := r.queries.ListProjectsByOrgId(ctx, orgID.Int64())
 	if err != nil {
 		return nil, err
 	}
@@ -57,14 +58,14 @@ func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID int64) ([]dom
 	return projects, nil
 }
 
-func (r *ProjectRepository) Delete(ctx context.Context, id int64) error {
-	return r.queries.DeleteProject(ctx, id)
+func (r *ProjectRepository) Delete(ctx context.Context, id snow.ID) error {
+	return r.queries.DeleteProject(ctx, id.Int64())
 }
 
 func toDomainProject(row sqlcSqlite.Project) domain.Project {
 	return domain.Project{
-		ID:          row.ID,
-		OrgID:       row.OrgID,
+		ID:          snow.ID(row.ID),
+		OrgID:       snow.ID(row.OrgID),
 		Slug:        row.Slug,
 		Name:        row.Name,
 		Description: row.Description,

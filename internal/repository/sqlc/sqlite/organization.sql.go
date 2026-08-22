@@ -10,16 +10,17 @@ import (
 )
 
 const createOrganization = `-- name: CreateOrganization :one
-INSERT INTO organizations (name, slug) VALUES (?, ?) RETURNING id, slug, name, created_at, updated_at, deleted, deleted_at
+INSERT INTO organizations (id, name, slug) VALUES (?, ?, ?) RETURNING id, slug, name, created_at, updated_at, deleted, deleted_at
 `
 
 type CreateOrganizationParams struct {
+	ID   int64  `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`
 }
 
 func (q *Queries) CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error) {
-	row := q.db.QueryRowContext(ctx, createOrganization, arg.Name, arg.Slug)
+	row := q.db.QueryRowContext(ctx, createOrganization, arg.ID, arg.Name, arg.Slug)
 	var i Organization
 	err := row.Scan(
 		&i.ID,

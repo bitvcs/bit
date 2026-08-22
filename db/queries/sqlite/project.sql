@@ -1,5 +1,5 @@
 -- name: CreateProject :one
-INSERT INTO projects (org_id, slug, name, description) VALUES (?, ?, ?, ?) RETURNING *;
+INSERT INTO projects (id, org_id, slug, name, description) VALUES (?, ?, ?, ?, ?) RETURNING *;
 
 -- name: GetProject :one
 SELECT * FROM projects WHERE id = ? AND deleted = false LIMIT 1;

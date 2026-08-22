@@ -2,10 +2,10 @@ package usecase
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/snow"
 	"github.com/bitvcs/bit/internal/usecase/dto"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -18,12 +18,12 @@ const (
 //go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=auth_mock_test.go -package=usecase
 type userRepository interface {
 	GetByEmail(ctx context.Context, email string) (*domain.User, error)
-	GetByID(ctx context.Context, id int64) (*domain.User, error)
+	GetByID(ctx context.Context, id snow.ID) (*domain.User, error)
 }
 
 //go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=auth_mock_test.go -package=usecase
 type authRepository interface {
-	SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt time.Time) error
+	SaveRefreshToken(ctx context.Context, userID snow.ID, refreshToken string, expiresAt time.Time) error
 	GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (*domain.RefreshToken, error)
 }
 
@@ -93,14 +93,14 @@ func (a *Auth) generateLoginResult(ctx context.Context, user *domain.User) (*dto
 	timeStart := time.Now()
 	claims := domain.Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			Subject:   strconv.FormatInt(user.ID, 10),
+			Subject:   user.ID.Base36(),
 			IssuedAt:  jwt.NewNumericDate(timeStart),
 			ExpiresAt: jwt.NewNumericDate(timeStart.Add(tokenExpirationMinutes * time.Minute)),
 		},
 		UserID:       user.ID,
 		IsSuperAdmin: user.IsSuperAdmin,
 		IsAdmin:      user.IsAdmin,
-		OrgID:        []int64{},
+		OrgID:        []snow.ID{},
 	}
 	jwt, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(a.secret))
 	if err != nil {

@@ -1,9 +1,13 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/bitvcs/bit/internal/snow"
+)
 
 type Organization struct {
-	ID        int64      `json:"id"`
+	ID        snow.ID    `json:"id"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at"`
 	Deleted   bool       `json:"deleted"`
@@ -13,7 +17,7 @@ type Organization struct {
 }
 
 type Project struct {
-	ID          int64      `json:"id"`
+	ID          snow.ID    `json:"id"`
 	CreatedAt   time.Time  `json:"created_at"`
 	UpdatedAt   time.Time  `json:"updated_at"`
 	Deleted     bool       `json:"deleted"`
@@ -21,5 +25,5 @@ type Project struct {
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
 	Slug        string     `json:"slug"`
-	OrgID       int64      `json:"org_id"`
+	OrgID       snow.ID    `json:"org_id"`
 }

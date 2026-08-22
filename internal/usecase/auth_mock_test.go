@@ -15,6 +15,7 @@ import (
 	time "time"
 
 	domain "github.com/bitvcs/bit/internal/domain"
+	snow "github.com/bitvcs/bit/internal/snow"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -58,7 +59,7 @@ func (mr *MockuserRepositoryMockRecorder) GetByEmail(ctx, email any) *gomock.Cal
 }
 
 // GetByID mocks base method.
-func (m *MockuserRepository) GetByID(ctx context.Context, id int64) (*domain.User, error) {
+func (m *MockuserRepository) GetByID(ctx context.Context, id snow.ID) (*domain.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", ctx, id)
 	ret0, _ := ret[0].(*domain.User)
@@ -112,7 +113,7 @@ func (mr *MockauthRepositoryMockRecorder) GetAndDeleteRefreshToken(ctx, refreshT
 }
 
 // SaveRefreshToken mocks base method.
-func (m *MockauthRepository) SaveRefreshToken(ctx context.Context, userID int64, refreshToken string, expiresAt time.Time) error {
+func (m *MockauthRepository) SaveRefreshToken(ctx context.Context, userID snow.ID, refreshToken string, expiresAt time.Time) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SaveRefreshToken", ctx, userID, refreshToken, expiresAt)
 	ret0, _ := ret[0].(error)
