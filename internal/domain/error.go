@@ -20,6 +20,17 @@ func (e *Error) String() string {
 	return fmt.Sprintf("Error{Code: %d, Message: %s, InternalMessage: %s}", e.Code, e.Message, e.InternalMessage)
 }
 
+func IsErrorNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e, ok := err.(*Error)
+	if !ok {
+		return false
+	}
+	return e.Code == 404
+}
+
 func NewErrorRecordNotFound() *Error {
 	return &Error{
 		Code:    404,

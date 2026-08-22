@@ -11,4 +11,5 @@ type AppContext interface {
 	Claims() *domain.Claims
 	ReadJson(v any) error
 	WriteJson(statusCode int, v any) error
+	HandleError(err error)
 }

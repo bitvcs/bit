@@ -44,6 +44,9 @@ func NewAuth(secret string, userRepo userRepository, authRepo authRepository) *A
 func (a *Auth) LoginWithEmailPassword(ctx context.Context, email string, password string) (*dto.LoginResult, error) {
 	user, err := a.userRepo.GetByEmail(ctx, email)
 	if err != nil {
+		if domain.IsErrorNotFound(err) {
+			return nil, domain.NewErrorUser("invalid email or password")
+		}
 		return nil, err
 	}
 	return a.generateLoginResult(ctx, user)

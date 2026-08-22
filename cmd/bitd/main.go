@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/bitvcs/bit/db"
 	"github.com/bitvcs/bit/internal/config"
 	"github.com/bitvcs/bit/internal/http/api"
 	"github.com/bitvcs/bit/internal/repository/sqlite"
@@ -28,6 +29,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	slog.Info("migrating database...")
+	err = db.MigrateUp(dbConn, "sqlite3")
+	if err != nil {
+		panic(err)
+	}
+	slog.Info("database migration completed")
+
 	authRepo := sqlite.NewAuthRepository(dbConn)
 	userRepo := sqlite.NewUserRepository(dbConn)
 

@@ -2,9 +2,12 @@ package api
 
 import (
 	"context"
+	"log/slog"
+	"net/http"
 
 	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/http"
+	httpApp "github.com/bitvcs/bit/internal/http"
+	"github.com/bitvcs/bit/internal/http/model"
 	"github.com/emicklei/go-restful/v3"
 )
 
@@ -14,7 +17,7 @@ type appContext struct {
 	claims *domain.Claims
 }
 
-func newAppContext(req *restful.Request, resp *restful.Response) (http.AppContext, error) {
+func newAppContext(req *restful.Request, resp *restful.Response) (httpApp.AppContext, error) {
 	var claims *domain.Claims
 	claimInterface, ok := req.Attribute(AttributeClaims).(*domain.Claims)
 	if ok {
@@ -40,5 +43,19 @@ func (a *appContext) ReadJson(v any) error {
 }
 
 func (a *appContext) WriteJson(statusCode int, v any) error {
-	return a.resp.WriteHeaderAndJson(statusCode, v, restful.MIME_JSON)
+	err := a.resp.WriteHeaderAndJson(statusCode, v, restful.MIME_JSON)
+	if err != nil {
+		return domain.NewErrorUser(err.Error())
+	}
+	return nil
+}
+
+func (a *appContext) HandleError(err error) {
+	apiErr, ok := err.(*domain.Error)
+	if !ok {
+		slog.Error("error unknown", "error", err)
+		a.resp.WriteHeaderAndJson(http.StatusInternalServerError, model.NewAPIError("internal unknown error"), restful.MIME_JSON)
+	} else {
+		a.resp.WriteHeaderAndJson(apiErr.Code, model.NewAPIError(apiErr.Message), restful.MIME_JSON)
+	}
 }
