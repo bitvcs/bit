@@ -28,7 +28,10 @@ func newSQLiteTestDB(t *testing.T) (*sql.DB, *sqlcSqlite.Queries) {
 func seedUser(t *testing.T, q *sqlcSqlite.Queries, name, email string, photoUrl sql.NullString) snow.ID {
 	t.Helper()
 
+	node, err := snow.NewNode(1)
+	require.NoError(t, err)
 	id, err := q.UserCreate(context.Background(), sqlcSqlite.UserCreateParams{
+		ID:       node.Generate().Int64(),
 		Name:     name,
 		Email:    email,
 		Password: "hashed-password",

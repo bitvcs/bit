@@ -74,7 +74,7 @@ func TestAPIRoutes(t *testing.T) {
 		require.NotEmpty(t, login.RefreshToken)
 
 		parsed := parseLoginAccessToken(t, login.AccessToken, "test-secret")
-		require.Equal(t, userID, parsed.UserID)
+		require.Equal(t, snow.ID(userID), parsed.UserID)
 	})
 
 	t.Run("login unknown user", func(t *testing.T) {

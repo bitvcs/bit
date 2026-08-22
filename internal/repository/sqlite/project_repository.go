@@ -27,6 +27,7 @@ func (r *ProjectRepository) Create(ctx context.Context, project domain.Project) 
 		slug = slugify(project.Name)
 	}
 	row, err := r.queries.CreateProject(ctx, sqlcSqlite.CreateProjectParams{
+		ID:          project.ID.Int64(),
 		OrgID:       project.OrgID.Int64(),
 		Slug:        slug,
 		Name:        project.Name,

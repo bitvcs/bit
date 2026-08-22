@@ -8,6 +8,7 @@ import (
 
 	database "github.com/bitvcs/bit/db"
 	"github.com/bitvcs/bit/internal/domain"
+	"github.com/bitvcs/bit/internal/snow"
 )
 
 func TestProjectRepositorySQLite(t *testing.T) {
@@ -20,7 +21,10 @@ func TestProjectRepositorySQLite(t *testing.T) {
 	repo := NewProjectRepository(db)
 	ctx := context.Background()
 
+	snowNode, err := snow.NewNode(1)
+	require.NoError(t, err)
 	created, err := repo.Create(ctx, domain.Project{
+		ID:          snowNode.Generate(),
 		OrgID:       1,
 		Name:        "project-a",
 		Description: "first project",
@@ -39,14 +43,14 @@ func TestProjectRepositorySQLite(t *testing.T) {
 	_, err = repo.Get(ctx, 999999)
 	require.Error(t, err)
 
-	_, err = repo.Create(ctx, domain.Project{OrgID: 1, Name: "project-b", Description: "second"})
+	_, err = repo.Create(ctx, domain.Project{ID: snowNode.Generate(), OrgID: 1, Name: "project-b", Description: "second"})
 	require.NoError(t, err)
 
 	projects, err := repo.ListByOrgID(ctx, 1)
 	require.NoError(t, err)
 	require.Len(t, projects, 2)
 
-	created2, err := repo.Create(ctx, domain.Project{OrgID: 1, Name: "project-c", Description: "third"})
+	created2, err := repo.Create(ctx, domain.Project{ID: snowNode.Generate(), OrgID: 1, Name: "project-c", Description: "third"})
 	require.NoError(t, err)
 	require.NoError(t, repo.Delete(ctx, created2.ID))
 
