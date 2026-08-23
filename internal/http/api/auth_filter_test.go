@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/bitvcs/bit/internal/domain"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/nipalab/nipa/internal/domain"
 	"github.com/stretchr/testify/require"
 )
 

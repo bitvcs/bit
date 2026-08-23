@@ -3,12 +3,12 @@ package api
 import (
 	"net/http"
 
-	httpApp "github.com/bitvcs/bit/internal/http"
-	"github.com/bitvcs/bit/internal/http/handler"
-	"github.com/bitvcs/bit/internal/http/model"
-	"github.com/bitvcs/bit/internal/http/swagger"
-	"github.com/bitvcs/bit/internal/usecase"
 	"github.com/emicklei/go-restful/v3"
+	httpApp "github.com/nipalab/nipa/internal/http"
+	"github.com/nipalab/nipa/internal/http/handler"
+	"github.com/nipalab/nipa/internal/http/model"
+	"github.com/nipalab/nipa/internal/http/swagger"
+	"github.com/nipalab/nipa/internal/usecase"
 )
 
 type usecaseContainer interface {

@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	database "github.com/bitvcs/bit/db"
-	"github.com/bitvcs/bit/internal/domain"
-	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
-	"github.com/bitvcs/bit/internal/snow"
+	database "github.com/nipalab/nipa/db"
+	"github.com/nipalab/nipa/internal/domain"
+	sqlcSqlite "github.com/nipalab/nipa/internal/repository/sqlc/sqlite"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 func newSQLiteTestDB(t *testing.T) (*sql.DB, *sqlcSqlite.Queries) {

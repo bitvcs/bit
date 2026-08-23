@@ -11,12 +11,12 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bitvcs/bit/db"
-	"github.com/bitvcs/bit/internal/config"
-	"github.com/bitvcs/bit/internal/http/api"
-	"github.com/bitvcs/bit/internal/repository/sqlite"
-	"github.com/bitvcs/bit/internal/snow"
-	"github.com/bitvcs/bit/internal/usecase"
+	"github.com/nipalab/nipa/db"
+	"github.com/nipalab/nipa/internal/config"
+	"github.com/nipalab/nipa/internal/http/api"
+	"github.com/nipalab/nipa/internal/repository/sqlite"
+	"github.com/nipalab/nipa/internal/snow"
+	"github.com/nipalab/nipa/internal/usecase"
 	_ "modernc.org/sqlite"
 )
 

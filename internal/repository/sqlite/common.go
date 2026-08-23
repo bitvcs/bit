@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/bitvcs/bit/internal/domain"
+	"github.com/nipalab/nipa/internal/domain"
 )
 
 func handleError(err error) error {

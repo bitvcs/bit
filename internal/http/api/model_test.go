@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bitvcs/bit/internal/domain"
-	httpApp "github.com/bitvcs/bit/internal/http"
 	"github.com/emicklei/go-restful/v3"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/nipalab/nipa/internal/domain"
+	httpApp "github.com/nipalab/nipa/internal/http"
 	"github.com/stretchr/testify/require"
 )
 

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/bitvcs/bit/internal/usecase"
+	"github.com/nipalab/nipa/internal/usecase"
 )
 
 type usecaseContainer interface {

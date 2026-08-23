@@ -5,10 +5,10 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/bitvcs/bit/internal/domain"
-	httpApp "github.com/bitvcs/bit/internal/http"
-	"github.com/bitvcs/bit/internal/http/model"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/nipalab/nipa/internal/domain"
+	httpApp "github.com/nipalab/nipa/internal/http"
+	"github.com/nipalab/nipa/internal/http/model"
 )
 
 type appContext struct {

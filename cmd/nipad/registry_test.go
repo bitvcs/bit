@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/bitvcs/bit/internal/usecase"
+	"github.com/nipalab/nipa/internal/usecase"
 	"github.com/stretchr/testify/require"
 )
 

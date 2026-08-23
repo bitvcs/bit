@@ -3,7 +3,7 @@ package domain
 import (
 	"time"
 
-	"github.com/bitvcs/bit/internal/snow"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 type Organization struct {

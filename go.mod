@@ -1,4 +1,4 @@
-module github.com/bitvcs/bit
+module github.com/nipalab/nipa
 
 go 1.26.3
 

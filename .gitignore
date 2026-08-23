@@ -29,7 +29,7 @@ go.work.sum
 # Local config with secrets (tracked sample: config.yaml.sample)
 config.yaml
 
-# Local databases (sqlite DSN: bit.db)
+# Local databases (sqlite DSN: nipa.db)
 *.db
 *.db-journal
 *.db-wal

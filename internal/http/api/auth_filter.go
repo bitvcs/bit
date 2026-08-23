@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/http/model"
 	"github.com/emicklei/go-restful/v3"
+	"github.com/nipalab/nipa/internal/domain"
+	"github.com/nipalab/nipa/internal/http/model"
 )
 
 const (

@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/snow"
-	"github.com/bitvcs/bit/internal/usecase/dto"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/nipalab/nipa/internal/domain"
+	"github.com/nipalab/nipa/internal/snow"
+	"github.com/nipalab/nipa/internal/usecase/dto"
 )
 
 const (
