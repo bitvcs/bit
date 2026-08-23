@@ -20,8 +20,8 @@ func SetupSwagger() {
 		PostBuildSwaggerObjectHandler: func(s *spec.Swagger) {
 			s.Info = &spec.Info{
 				InfoProps: spec.InfoProps{
-					Title:       "Bitd Docs",
-					Description: "Bitd Docs",
+					Title:       "Nipa API Docs",
+					Description: "Nipa API Docs",
 				},
 			}
 			s.SecurityDefinitions = map[string]*spec.SecurityScheme{

@@ -7,15 +7,15 @@ import (
 	"testing"
 	"time"
 
-	database "github.com/bitvcs/bit/db"
-	"github.com/bitvcs/bit/internal/domain"
-	httpApp "github.com/bitvcs/bit/internal/http"
-	"github.com/bitvcs/bit/internal/http/model"
-	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
-	"github.com/bitvcs/bit/internal/repository/sqlite"
-	"github.com/bitvcs/bit/internal/snow"
-	"github.com/bitvcs/bit/internal/usecase"
 	"github.com/golang-jwt/jwt/v5"
+	database "github.com/nipalab/nipa/db"
+	"github.com/nipalab/nipa/internal/domain"
+	httpApp "github.com/nipalab/nipa/internal/http"
+	"github.com/nipalab/nipa/internal/http/model"
+	sqlcSqlite "github.com/nipalab/nipa/internal/repository/sqlc/sqlite"
+	"github.com/nipalab/nipa/internal/repository/sqlite"
+	"github.com/nipalab/nipa/internal/snow"
+	"github.com/nipalab/nipa/internal/usecase"
 	"github.com/stretchr/testify/require"
 )
 

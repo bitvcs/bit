@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/bitvcs/bit/internal/http/handler"
-	"github.com/bitvcs/bit/internal/http/model"
+	"github.com/nipalab/nipa/internal/http/handler"
+	"github.com/nipalab/nipa/internal/http/model"
 
 	restfulspec "github.com/emicklei/go-restful-openapi/v2"
 	"github.com/emicklei/go-restful/v3"

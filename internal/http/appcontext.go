@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	"github.com/bitvcs/bit/internal/domain"
+	"github.com/nipalab/nipa/internal/domain"
 )
 
 type AppContext interface {

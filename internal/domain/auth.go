@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"github.com/bitvcs/bit/internal/snow"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 type Claims struct {

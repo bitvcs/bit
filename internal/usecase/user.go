@@ -1,6 +1,6 @@
 package usecase
 
-import "github.com/bitvcs/bit/internal/snow"
+import "github.com/nipalab/nipa/internal/snow"
 
 type User struct {
 	snowNode snow.Node

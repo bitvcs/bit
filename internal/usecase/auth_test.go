@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/snow"
+	"github.com/nipalab/nipa/internal/domain"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 func TestAuth_LoginWithEmailPassword(t *testing.T) {

@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	database "github.com/bitvcs/bit/db"
-	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/snow"
+	database "github.com/nipalab/nipa/db"
+	"github.com/nipalab/nipa/internal/domain"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 func TestProjectRepositorySQLite(t *testing.T) {

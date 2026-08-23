@@ -1,7 +1,7 @@
 SQLC       ?= go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 MIGRATE_CMD := go run ./cmd/migrate
 DRIVER     ?= sqlite3
-DSN        ?= bit.db
+DSN        ?= nipa.db
 MIGRATIONS_DIR := db/migrations
 
 .PHONY: sqlc mock migrate-up migrate-down migrate-create build test lint
@@ -32,7 +32,7 @@ migrate-create:
 	echo "created $(MIGRATIONS_DIR)/$${ts}_$(name).up.sql and .down.sql"
 
 build:
-	go build -o bin/bitd ./cmd/bitd
+	go build -o bin/nipad ./cmd/nipad
 
 ## Run all tests (requires Docker for testcontainers-backed repository tests).
 test:

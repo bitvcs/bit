@@ -27,7 +27,7 @@ func clearConfigEnv(t *testing.T) {
 
 const testYAML = `SERVER_ADDRESS: 127.0.0.1
 SERVER_PORT: 6745
-DATABASE_DSN: sqlite://bit.db
+DATABASE_DSN: sqlite://nipa.db
 JWT_KEY: yaml-secret
 LOG_LEVEL: debug
 `
@@ -43,7 +43,7 @@ func TestLoadConfig_FromYAML(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "127.0.0.1", cfg.ServerAddress)
 	require.Equal(t, 6745, cfg.ServerPort)
-	require.Equal(t, "sqlite://bit.db", cfg.DatabaseDSN)
+	require.Equal(t, "sqlite://nipa.db", cfg.DatabaseDSN)
 	require.Equal(t, "yaml-secret", cfg.JWTKey)
 	require.Equal(t, "debug", cfg.LogLevel)
 }

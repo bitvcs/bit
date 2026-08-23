@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 
-	"github.com/bitvcs/bit/internal/domain"
+	"github.com/nipalab/nipa/internal/domain"
 )
 
 // ProjectRepository is the port implemented by adapters that persist projects.

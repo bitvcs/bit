@@ -14,8 +14,8 @@ import (
 	reflect "reflect"
 	time "time"
 
-	domain "github.com/bitvcs/bit/internal/domain"
-	snow "github.com/bitvcs/bit/internal/snow"
+	domain "github.com/nipalab/nipa/internal/domain"
+	snow "github.com/nipalab/nipa/internal/snow"
 	gomock "go.uber.org/mock/gomock"
 )
 

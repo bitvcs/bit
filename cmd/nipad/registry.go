@@ -1,6 +1,6 @@
 package main
 
-import "github.com/bitvcs/bit/internal/usecase"
+import "github.com/nipalab/nipa/internal/usecase"
 
 type Registry struct {
 	authUsecase *usecase.Auth

@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/bitvcs/bit/internal/domain"
-	"github.com/bitvcs/bit/internal/usecase"
+	"github.com/nipalab/nipa/internal/domain"
+	"github.com/nipalab/nipa/internal/usecase"
 )
 
 // fakeProjectRepository is an in-memory stub implementing usecase.ProjectRepository.

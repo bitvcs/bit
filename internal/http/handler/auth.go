@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/bitvcs/bit/internal/http"
-	"github.com/bitvcs/bit/internal/http/model"
+	"github.com/nipalab/nipa/internal/http"
+	"github.com/nipalab/nipa/internal/http/model"
 )
 
 func (h *Handler) AuthLogin(appCtx http.AppContext) {

@@ -5,12 +5,12 @@ import (
 	"flag"
 	"log"
 
-	database "github.com/bitvcs/bit/db"
+	database "github.com/nipalab/nipa/db"
 )
 
 func main() {
 	dialect := flag.String("dialect", "sqlite3", "database dialect: sqlite3 or postgres")
-	dsn := flag.String("dsn", "bit.db", "data source name (sqlite file path or postgres connection string)")
+	dsn := flag.String("dsn", "nipa.db", "data source name (sqlite file path or postgres connection string)")
 	action := flag.String("action", "up", "migration action: up or down")
 	flag.Parse()
 

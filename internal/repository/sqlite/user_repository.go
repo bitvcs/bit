@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/bitvcs/bit/internal/domain"
-	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
-	"github.com/bitvcs/bit/internal/snow"
+	"github.com/nipalab/nipa/internal/domain"
+	sqlcSqlite "github.com/nipalab/nipa/internal/repository/sqlc/sqlite"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 type User struct {

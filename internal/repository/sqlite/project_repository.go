@@ -6,9 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bitvcs/bit/internal/domain"
-	sqlcSqlite "github.com/bitvcs/bit/internal/repository/sqlc/sqlite"
-	"github.com/bitvcs/bit/internal/snow"
+	"github.com/nipalab/nipa/internal/domain"
+	sqlcSqlite "github.com/nipalab/nipa/internal/repository/sqlc/sqlite"
+	"github.com/nipalab/nipa/internal/snow"
 )
 
 var nonAlphaNum = regexp.MustCompile(`[^a-z0-9]+`)
