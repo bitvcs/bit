@@ -11,7 +11,7 @@ func (h *Handler) AuthLogin(appCtx http.AppContext) {
 		appCtx.HandleError(err)
 		return
 	}
-	result, err := h.useCase.AuthUsecase().LoginWithEmailPassword(appCtx.Context(), body.Email, body.Password)
+	result, err := h.useCase.Auth().LoginWithEmailPassword(appCtx.Context(), body.Email, body.Password)
 	if err != nil {
 		appCtx.HandleError(err)
 		return
@@ -29,7 +29,7 @@ func (h *Handler) AuthRefreshToken(appCtx http.AppContext) {
 		appCtx.HandleError(err)
 		return
 	}
-	result, err := h.useCase.AuthUsecase().LoginWithRefreshToken(appCtx.Context(), body.RefreshToken)
+	result, err := h.useCase.Auth().LoginWithRefreshToken(appCtx.Context(), body.RefreshToken)
 	if err != nil {
 		appCtx.HandleError(err)
 		return

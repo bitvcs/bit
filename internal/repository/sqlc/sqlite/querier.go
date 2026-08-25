@@ -9,6 +9,9 @@ import (
 )
 
 type Querier interface {
+	BranchCreate(ctx context.Context, arg BranchCreateParams) error
+	BranchList(ctx context.Context, arg BranchListParams) ([]Branch, error)
+	BranchUpdate(ctx context.Context, arg BranchUpdateParams) error
 	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error)
 	DeleteOrganization(ctx context.Context, id int64) error

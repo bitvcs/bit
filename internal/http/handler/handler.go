@@ -5,8 +5,8 @@ import (
 )
 
 type usecaseContainer interface {
-	AuthUsecase() *usecase.Auth
-	UserUsecase() *usecase.User
+	Auth() *usecase.Auth
+	User() *usecase.User
 }
 
 type Handler struct {

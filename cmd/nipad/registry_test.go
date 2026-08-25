@@ -13,6 +13,6 @@ func TestRegistry(t *testing.T) {
 		userUsecase: usecase.NewUser(nil),
 	}
 
-	require.Same(t, reg.authUsecase, reg.AuthUsecase())
-	require.Same(t, reg.userUsecase, reg.UserUsecase())
+	require.Same(t, reg.authUsecase, reg.Auth())
+	require.Same(t, reg.userUsecase, reg.User())
 }

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package greet;
+option go_package = "./pb";
+
+import "google/protobuf/timestamp.proto";
+
+message ProjectContext {
+    string org = 1;
+    string project = 2;
+}
+
+enum FileMode {
+    FILE_MODE_UNSPECIFIED = 0;
+    FILE_MODE_READ_ONLY = 1;
+    FILE_MODE_READ_WRITE = 2;
+    FILE_MODE_EXECUTABLE = 3;
+}
+
+message FileNode {
+    string path = 1;
+    FileMode mode = 2;
+    int64 size_bytes = 3;
+    bool is_binary = 4;
+    repeated string chunk_hashes = 5;
+}
+
+message TreeManifest {
+    string tree_hash = 1;
+    string path = 2; // Subdirectory path, e.g., "assets/shaders"
+    repeated TreeManifest sub_trees = 3; // Child directory trees
+    repeated FileNode files = 4;
+}
+
+message GetTreeManifestRequest {
+    ProjectContext context = 1;
+    string path = 2;
+    optional string tree_hash = 3;
+    bool recursive = 4;
+}
+
+message GetTreeManifestResponse {
+    TreeManifest root_tree = 1;
+}
+
+message Branch {
+    string id = 1;
+    string name = 2;
+    string commit_id = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+}
+
+message GetListBranchRequest {
+    ProjectContext context = 1;
+    int64 limit = 2;
+    string cursor = 3;
+}
+
+message GetListBranchResponse {
+    string next_cursor = 1;
+    repeated Branch branches = 2;
+}
+
+service NipaService {
+    rpc GetListBranch(GetListBranchRequest) returns (GetListBranchResponse);
+    rpc GetTreeManifest(GetTreeManifestRequest) returns (GetTreeManifestResponse);
+}

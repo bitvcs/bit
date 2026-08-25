@@ -7,10 +7,10 @@ type Registry struct {
 	userUsecase *usecase.User
 }
 
-func (r *Registry) AuthUsecase() *usecase.Auth {
+func (r *Registry) Auth() *usecase.Auth {
 	return r.authUsecase
 }
 
-func (r *Registry) UserUsecase() *usecase.User {
+func (r *Registry) User() *usecase.User {
 	return r.userUsecase
 }

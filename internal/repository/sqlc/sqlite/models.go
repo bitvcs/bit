@@ -9,6 +9,52 @@ import (
 	"time"
 )
 
+type Branch struct {
+	ID        int64         `json:"id"`
+	ProjectID int64         `json:"project_id"`
+	Name      string        `json:"name"`
+	Protected bool          `json:"protected"`
+	CommitID  sql.NullInt64 `json:"commit_id"`
+	UpdatedAt sql.NullTime  `json:"updated_at"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+}
+
+type Chunk struct {
+	ID        int64        `json:"id"`
+	Hash      []byte       `json:"hash"`
+	SizeBytes int64        `json:"size_bytes"`
+	CreatedAt sql.NullTime `json:"created_at"`
+}
+
+type Commit struct {
+	ID        int64         `json:"id"`
+	Hash      []byte        `json:"hash"`
+	ProjectID int64         `json:"project_id"`
+	TreeID    int64         `json:"tree_id"`
+	Parent1ID sql.NullInt64 `json:"parent_1_id"`
+	Parent2ID sql.NullInt64 `json:"parent_2_id"`
+	UserID    int64         `json:"user_id"`
+	Message   string        `json:"message"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+}
+
+type File struct {
+	ID        int64         `json:"id"`
+	Name      string        `json:"name"`
+	Mode      int64         `json:"mode"`
+	TreeID    sql.NullInt64 `json:"tree_id"`
+	Hash      []byte        `json:"hash"`
+	SizeBytes int64         `json:"size_bytes"`
+	IsBinary  bool          `json:"is_binary"`
+	CreatedAt sql.NullTime  `json:"created_at"`
+}
+
+type FileChunk struct {
+	FileID     int64 `json:"file_id"`
+	ChunkID    int64 `json:"chunk_id"`
+	ChunkIndex int64 `json:"chunk_index"`
+}
+
 type Group struct {
 	ID          int64          `json:"id"`
 	OrgID       int64          `json:"org_id"`
@@ -72,6 +118,15 @@ type RefreshToken struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expires_at"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type TreeNode struct {
+	ID           int64         `json:"id"`
+	Hash         []byte        `json:"hash"`
+	Name         string        `json:"name"`
+	Mode         int64         `json:"mode"`
+	ParentTreeID sql.NullInt64 `json:"parent_tree_id"`
+	CreatedAt    sql.NullTime  `json:"created_at"`
 }
 
 type User struct {
