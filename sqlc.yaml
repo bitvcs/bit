@@ -9,6 +9,7 @@ sql:
         out: "internal/repository/sqlc/sqlite"
         emit_json_tags: true
         emit_interface: true
+
   - engine: "postgresql"
     schema: "db/migrations/postgres"
     queries: "db/queries/postgres"

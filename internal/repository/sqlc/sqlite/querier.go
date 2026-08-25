@@ -9,12 +9,17 @@ import (
 )
 
 type Querier interface {
+	BranchCreate(ctx context.Context, arg BranchCreateParams) error
+	BranchGet(ctx context.Context, arg BranchGetParams) (Branch, error)
+	BranchList(ctx context.Context, arg BranchListParams) ([]Branch, error)
+	BranchUpdate(ctx context.Context, arg BranchUpdateParams) error
 	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error)
 	DeleteOrganization(ctx context.Context, id int64) error
 	DeleteProject(ctx context.Context, id int64) error
 	GetOrganization(ctx context.Context, id int64) (Organization, error)
 	GetProject(ctx context.Context, id int64) (Project, error)
+	GetProjectByOrgIDAndID(ctx context.Context, arg GetProjectByOrgIDAndIDParams) (Project, error)
 	ListOrganizations(ctx context.Context) ([]Organization, error)
 	ListProjectsByOrgId(ctx context.Context, orgID int64) ([]Project, error)
 	RefreshTokenCreate(ctx context.Context, arg RefreshTokenCreateParams) (int64, error)

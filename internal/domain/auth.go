@@ -1,9 +1,22 @@
 package domain
 
 import (
+	"context"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/nipalab/nipa/internal/snow"
 )
+
+type claimKey struct{}
+
+func ContextWithClaim(ctx context.Context, claim Claims) context.Context {
+	return context.WithValue(ctx, claimKey{}, claim)
+}
+
+func ClaimFromContext(ctx context.Context) (Claims, bool) {
+	claim, ok := ctx.Value(claimKey{}).(Claims)
+	return claim, ok
+}
 
 type Claims struct {
 	jwt.RegisteredClaims

@@ -25,8 +25,8 @@ type testRegistry struct {
 	user *usecase.User
 }
 
-func (r *testRegistry) AuthUsecase() *usecase.Auth { return r.auth }
-func (r *testRegistry) UserUsecase() *usecase.User { return r.user }
+func (r *testRegistry) Auth() *usecase.Auth { return r.auth }
+func (r *testRegistry) User() *usecase.User { return r.user }
 
 // TestAPIRoutes exercises the fully wired HTTP API. It must call SetupRoute
 // exactly once per process: SetupSwagger registers on the default mux, which

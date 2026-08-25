@@ -9,14 +9,18 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/nipalab/nipa/db"
 	"github.com/nipalab/nipa/internal/config"
+	"github.com/nipalab/nipa/internal/grpc/pb"
+	"github.com/nipalab/nipa/internal/grpc/server"
 	"github.com/nipalab/nipa/internal/http/api"
 	"github.com/nipalab/nipa/internal/repository/sqlite"
 	"github.com/nipalab/nipa/internal/snow"
 	"github.com/nipalab/nipa/internal/usecase"
+	"google.golang.org/grpc"
 	_ "modernc.org/sqlite"
 )
 
@@ -57,7 +61,21 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	httpServer := &http.Server{Addr: address, Handler: container}
+	grpcInterceptor := server.NewInterceptor(reg.Auth())
+
+	grpcRegistrar := grpc.NewServer(grpc.UnaryInterceptor(grpcInterceptor.JWTUnary()))
+	grpcServer := server.New(reg)
+	pb.RegisterNipaServiceServer(grpcRegistrar, grpcServer)
+
+	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor == 2 && strings.HasPrefix(r.Header.Get("Content-Type"), "application/grpc") {
+			grpcRegistrar.ServeHTTP(w, r)
+		} else {
+			container.ServeHTTP(w, r)
+		}
+	})
+
+	httpServer := &http.Server{Addr: address, Handler: mainHandler}
 	ln, err := net.Listen("tcp", address)
 	if err != nil {
 		panic(err)

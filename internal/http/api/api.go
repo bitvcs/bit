@@ -12,8 +12,8 @@ import (
 )
 
 type usecaseContainer interface {
-	AuthUsecase() *usecase.Auth
-	UserUsecase() *usecase.User
+	Auth() *usecase.Auth
+	User() *usecase.User
 }
 
 type API struct {
@@ -27,7 +27,7 @@ func NewAPI(useCase usecaseContainer) *API {
 }
 
 func (a *API) SetupRoute() http.Handler {
-	//authFilter := NewAuthFilter(a.useCase.AuthUsecase())
+	//authFilter := NewAuthFilter(a.useCase.Auth())
 	cors := restful.CrossOriginResourceSharing{
 		AllowedMethods: []string{"POST", "GET", "PUT", "DELETE"},
 		AllowedHeaders: []string{"Content-Type", "Accept"},

@@ -74,6 +74,32 @@ func (q *Queries) GetProject(ctx context.Context, id int64) (Project, error) {
 	return i, err
 }
 
+const getProjectByOrgIDAndID = `-- name: GetProjectByOrgIDAndID :one
+SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE id = ? AND org_id = ? AND deleted = false LIMIT 1
+`
+
+type GetProjectByOrgIDAndIDParams struct {
+	ID    int64 `json:"id"`
+	OrgID int64 `json:"org_id"`
+}
+
+func (q *Queries) GetProjectByOrgIDAndID(ctx context.Context, arg GetProjectByOrgIDAndIDParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, getProjectByOrgIDAndID, arg.ID, arg.OrgID)
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.OrgID,
+		&i.Slug,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const listProjectsByOrgId = `-- name: ListProjectsByOrgId :many
 SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE org_id = ? AND deleted = false ORDER BY id
 `

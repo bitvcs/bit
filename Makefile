@@ -34,6 +34,9 @@ migrate-create:
 build:
 	go build -o bin/nipad ./cmd/nipad
 
+proto:
+	protoc --go_out=internal/grpc --go-grpc_out=internal/grpc internal/grpc/proto/server.proto
+
 ## Run all tests (requires Docker for testcontainers-backed repository tests).
 test:
 	go test ./... -v

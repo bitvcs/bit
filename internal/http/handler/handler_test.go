@@ -54,8 +54,8 @@ type handlerRegistry struct {
 	user *usecase.User
 }
 
-func (r *handlerRegistry) AuthUsecase() *usecase.Auth { return r.auth }
-func (r *handlerRegistry) UserUsecase() *usecase.User { return r.user }
+func (r *handlerRegistry) Auth() *usecase.Auth { return r.auth }
+func (r *handlerRegistry) User() *usecase.User { return r.user }
 
 func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, snow.ID) {
 	t.Helper()

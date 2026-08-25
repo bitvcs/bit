@@ -28,6 +28,13 @@ func TestIsErrorNotFound(t *testing.T) {
 	require.True(t, IsErrorNotFound(NewErrorRecordNotFound()))
 }
 
+func TestIsErrorNoPermission(t *testing.T) {
+	require.False(t, IsErrorNoPermission(nil))
+	require.False(t, IsErrorNoPermission(errors.New("plain")))
+	require.False(t, IsErrorNoPermission(NewErrorUser("forbidden")))
+	require.True(t, IsErrorNoPermission(NewErrorNoPermission()))
+}
+
 func TestNewErrorConstructors(t *testing.T) {
 	notFound := NewErrorRecordNotFound()
 	require.Equal(t, 404, notFound.Code)

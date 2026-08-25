@@ -1,16 +1,19 @@
 package domain
 
 import (
+	"context"
 	"time"
 
 	"github.com/nipalab/nipa/internal/snow"
 )
 
+type Permission int64
+
 const (
-	PermissionRead  = 1 << iota // 1
-	PermissionWrite             // 2
-	PermissionLock              // 4
-	PermissionAdmin = 1 << 16   // 65536
+	PermissionRead  Permission = 1 << iota // 1
+	PermissionWrite                        // 2
+	PermissionLock                         // 4
+	PermissionAdmin Permission = 1 << 16   // 65536
 )
 
 type PBACRule struct {
@@ -30,4 +33,17 @@ type ProjectPathPermission struct {
 	PathPattern string    `json:"path_pattern"`
 	IsAllowed   bool      `json:"is_allowed"`
 	CreatedAt   time.Time `json:"created_at"`
+}
+
+func HasProjectAccess(ctx context.Context, projectID snow.ID) bool {
+	claim, ok := ClaimFromContext(ctx)
+	if !ok {
+		return false
+	}
+
+	if claim.IsSuperAdmin || claim.IsAdmin {
+		return true
+	}
+
+	return false
 }
