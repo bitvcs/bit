@@ -674,6 +674,162 @@ func (x *GetBranchResponse) GetBranch() *Branch {
 	return nil
 }
 
+type LoginUsernamePasswordRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginUsernamePasswordRequest) Reset() {
+	*x = LoginUsernamePasswordRequest{}
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginUsernamePasswordRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginUsernamePasswordRequest) ProtoMessage() {}
+
+func (x *LoginUsernamePasswordRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginUsernamePasswordRequest.ProtoReflect.Descriptor instead.
+func (*LoginUsernamePasswordRequest) Descriptor() ([]byte, []int) {
+	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *LoginUsernamePasswordRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *LoginUsernamePasswordRequest) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type LoginWithRefreshRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RefreshToken  string                 `protobuf:"bytes,1,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginWithRefreshRequest) Reset() {
+	*x = LoginWithRefreshRequest{}
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginWithRefreshRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginWithRefreshRequest) ProtoMessage() {}
+
+func (x *LoginWithRefreshRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginWithRefreshRequest.ProtoReflect.Descriptor instead.
+func (*LoginWithRefreshRequest) Descriptor() ([]byte, []int) {
+	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *LoginWithRefreshRequest) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type LoginResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	ExpiresIn     int32                  `protobuf:"varint,3,opt,name=expires_in,json=expiresIn,proto3" json:"expires_in,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LoginResponse) Reset() {
+	*x = LoginResponse{}
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LoginResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LoginResponse) ProtoMessage() {}
+
+func (x *LoginResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
+func (*LoginResponse) Descriptor() ([]byte, []int) {
+	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *LoginResponse) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *LoginResponse) GetExpiresIn() int32 {
+	if x != nil {
+		return x.ExpiresIn
+	}
+	return 0
+}
+
 var File_internal_grpc_proto_server_proto protoreflect.FileDescriptor
 
 const file_internal_grpc_proto_server_proto_rawDesc = "" +
@@ -727,13 +883,25 @@ const file_internal_grpc_proto_server_proto_rawDesc = "" +
 	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x1b\n" +
 	"\tbranch_id\x18\x02 \x01(\tR\bbranchId\":\n" +
 	"\x11GetBranchResponse\x12%\n" +
-	"\x06branch\x18\x01 \x01(\v2\r.greet.BranchR\x06branch*r\n" +
+	"\x06branch\x18\x01 \x01(\v2\r.greet.BranchR\x06branch\"V\n" +
+	"\x1cLoginUsernamePasswordRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\">\n" +
+	"\x17LoginWithRefreshRequest\x12#\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"v\n" +
+	"\rLoginResponse\x12!\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12\x1d\n" +
+	"\n" +
+	"expires_in\x18\x03 \x01(\x05R\texpiresIn*r\n" +
 	"\bFileMode\x12\x19\n" +
 	"\x15FILE_MODE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13FILE_MODE_READ_ONLY\x10\x01\x12\x18\n" +
 	"\x14FILE_MODE_READ_WRITE\x10\x02\x12\x18\n" +
-	"\x14FILE_MODE_EXECUTABLE\x10\x032\xeb\x01\n" +
-	"\vNipaService\x12J\n" +
+	"\x14FILE_MODE_EXECUTABLE\x10\x032\x92\x03\n" +
+	"\vNipaService\x12V\n" +
+	"\x19LoginWithUsernamePassword\x12#.greet.LoginUsernamePasswordRequest\x1a\x14.greet.LoginResponse\x12M\n" +
+	"\x15LoginWithRefreshToken\x12\x1e.greet.LoginWithRefreshRequest\x1a\x14.greet.LoginResponse\x12J\n" +
 	"\rGetListBranch\x12\x1b.greet.GetListBranchRequest\x1a\x1c.greet.GetListBranchResponse\x12>\n" +
 	"\tGetBranch\x12\x17.greet.GetBranchRequest\x1a\x18.greet.GetBranchResponse\x12P\n" +
 	"\x0fGetTreeManifest\x12\x1d.greet.GetTreeManifestRequest\x1a\x1e.greet.GetTreeManifestResponseB\x06Z\x04./pbb\x06proto3"
@@ -751,20 +919,23 @@ func file_internal_grpc_proto_server_proto_rawDescGZIP() []byte {
 }
 
 var file_internal_grpc_proto_server_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_internal_grpc_proto_server_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_internal_grpc_proto_server_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_internal_grpc_proto_server_proto_goTypes = []any{
-	(FileMode)(0),                   // 0: greet.FileMode
-	(*ProjectContext)(nil),          // 1: greet.ProjectContext
-	(*FileNode)(nil),                // 2: greet.FileNode
-	(*TreeManifest)(nil),            // 3: greet.TreeManifest
-	(*GetTreeManifestRequest)(nil),  // 4: greet.GetTreeManifestRequest
-	(*GetTreeManifestResponse)(nil), // 5: greet.GetTreeManifestResponse
-	(*Branch)(nil),                  // 6: greet.Branch
-	(*GetListBranchRequest)(nil),    // 7: greet.GetListBranchRequest
-	(*GetListBranchResponse)(nil),   // 8: greet.GetListBranchResponse
-	(*GetBranchRequest)(nil),        // 9: greet.GetBranchRequest
-	(*GetBranchResponse)(nil),       // 10: greet.GetBranchResponse
-	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
+	(FileMode)(0),                        // 0: greet.FileMode
+	(*ProjectContext)(nil),               // 1: greet.ProjectContext
+	(*FileNode)(nil),                     // 2: greet.FileNode
+	(*TreeManifest)(nil),                 // 3: greet.TreeManifest
+	(*GetTreeManifestRequest)(nil),       // 4: greet.GetTreeManifestRequest
+	(*GetTreeManifestResponse)(nil),      // 5: greet.GetTreeManifestResponse
+	(*Branch)(nil),                       // 6: greet.Branch
+	(*GetListBranchRequest)(nil),         // 7: greet.GetListBranchRequest
+	(*GetListBranchResponse)(nil),        // 8: greet.GetListBranchResponse
+	(*GetBranchRequest)(nil),             // 9: greet.GetBranchRequest
+	(*GetBranchResponse)(nil),            // 10: greet.GetBranchResponse
+	(*LoginUsernamePasswordRequest)(nil), // 11: greet.LoginUsernamePasswordRequest
+	(*LoginWithRefreshRequest)(nil),      // 12: greet.LoginWithRefreshRequest
+	(*LoginResponse)(nil),                // 13: greet.LoginResponse
+	(*timestamppb.Timestamp)(nil),        // 14: google.protobuf.Timestamp
 }
 var file_internal_grpc_proto_server_proto_depIdxs = []int32{
 	0,  // 0: greet.FileNode.mode:type_name -> greet.FileMode
@@ -772,21 +943,25 @@ var file_internal_grpc_proto_server_proto_depIdxs = []int32{
 	2,  // 2: greet.TreeManifest.files:type_name -> greet.FileNode
 	1,  // 3: greet.GetTreeManifestRequest.context:type_name -> greet.ProjectContext
 	3,  // 4: greet.GetTreeManifestResponse.root_tree:type_name -> greet.TreeManifest
-	11, // 5: greet.Branch.created_at:type_name -> google.protobuf.Timestamp
-	11, // 6: greet.Branch.updated_at:type_name -> google.protobuf.Timestamp
+	14, // 5: greet.Branch.created_at:type_name -> google.protobuf.Timestamp
+	14, // 6: greet.Branch.updated_at:type_name -> google.protobuf.Timestamp
 	1,  // 7: greet.GetListBranchRequest.context:type_name -> greet.ProjectContext
-	11, // 8: greet.GetListBranchRequest.last_updated_at:type_name -> google.protobuf.Timestamp
+	14, // 8: greet.GetListBranchRequest.last_updated_at:type_name -> google.protobuf.Timestamp
 	6,  // 9: greet.GetListBranchResponse.branches:type_name -> greet.Branch
 	1,  // 10: greet.GetBranchRequest.context:type_name -> greet.ProjectContext
 	6,  // 11: greet.GetBranchResponse.branch:type_name -> greet.Branch
-	7,  // 12: greet.NipaService.GetListBranch:input_type -> greet.GetListBranchRequest
-	9,  // 13: greet.NipaService.GetBranch:input_type -> greet.GetBranchRequest
-	4,  // 14: greet.NipaService.GetTreeManifest:input_type -> greet.GetTreeManifestRequest
-	8,  // 15: greet.NipaService.GetListBranch:output_type -> greet.GetListBranchResponse
-	10, // 16: greet.NipaService.GetBranch:output_type -> greet.GetBranchResponse
-	5,  // 17: greet.NipaService.GetTreeManifest:output_type -> greet.GetTreeManifestResponse
-	15, // [15:18] is the sub-list for method output_type
-	12, // [12:15] is the sub-list for method input_type
+	11, // 12: greet.NipaService.LoginWithUsernamePassword:input_type -> greet.LoginUsernamePasswordRequest
+	12, // 13: greet.NipaService.LoginWithRefreshToken:input_type -> greet.LoginWithRefreshRequest
+	7,  // 14: greet.NipaService.GetListBranch:input_type -> greet.GetListBranchRequest
+	9,  // 15: greet.NipaService.GetBranch:input_type -> greet.GetBranchRequest
+	4,  // 16: greet.NipaService.GetTreeManifest:input_type -> greet.GetTreeManifestRequest
+	13, // 17: greet.NipaService.LoginWithUsernamePassword:output_type -> greet.LoginResponse
+	13, // 18: greet.NipaService.LoginWithRefreshToken:output_type -> greet.LoginResponse
+	8,  // 19: greet.NipaService.GetListBranch:output_type -> greet.GetListBranchResponse
+	10, // 20: greet.NipaService.GetBranch:output_type -> greet.GetBranchResponse
+	5,  // 21: greet.NipaService.GetTreeManifest:output_type -> greet.GetTreeManifestResponse
+	17, // [17:22] is the sub-list for method output_type
+	12, // [12:17] is the sub-list for method input_type
 	12, // [12:12] is the sub-list for extension type_name
 	12, // [12:12] is the sub-list for extension extendee
 	0,  // [0:12] is the sub-list for field type_name
@@ -805,7 +980,7 @@ func file_internal_grpc_proto_server_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_grpc_proto_server_proto_rawDesc), len(file_internal_grpc_proto_server_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

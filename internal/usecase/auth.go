@@ -118,6 +118,7 @@ func (a *Auth) generateLoginResult(ctx context.Context, user *domain.User) (*dto
 		AccessToken:  jwt,
 		RefreshToken: refreshToken,
 		TokenType:    "Bearer",
+		ExpiresIn:    tokenExpirationMinutes * 60,
 	}, nil
 }
 
