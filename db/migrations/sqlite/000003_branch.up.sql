@@ -41,18 +41,21 @@ CREATE TABLE commits (
     parent_2_id INTEGER REFERENCES commits(id),
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     message TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE branches (
     id INTEGER PRIMARY KEY,
     project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name TEXT NOT NULL, 
+    key TEXT NOT NULL,
     protected BOOLEAN NOT NULL DEFAULT FALSE,
     commit_id INTEGER REFERENCES commits(id),
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(project_id, name)
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted_at DATETIME,
+    UNIQUE(project_id, key)
 );
 
 CREATE INDEX idx_branches_project_updated_id 

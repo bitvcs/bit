@@ -31,20 +31,50 @@ func (q *Queries) BranchCreate(ctx context.Context, arg BranchCreateParams) erro
 	return err
 }
 
+const branchGet = `-- name: BranchGet :one
+SELECT id, project_id, name, "key", protected, commit_id, updated_at, created_at, deleted, deleted_at
+FROM branches
+WHERE project_id = ?1 AND id = ?2
+LIMIT 1
+`
+
+type BranchGetParams struct {
+	ProjectID int64 `json:"project_id"`
+	ID        int64 `json:"id"`
+}
+
+func (q *Queries) BranchGet(ctx context.Context, arg BranchGetParams) (Branch, error) {
+	row := q.db.QueryRowContext(ctx, branchGet, arg.ProjectID, arg.ID)
+	var i Branch
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.Name,
+		&i.Key,
+		&i.Protected,
+		&i.CommitID,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const branchList = `-- name: BranchList :many
-SELECT id, project_id, name, protected, commit_id, updated_at, created_at
+SELECT id, project_id, name, "key", protected, commit_id, updated_at, created_at, deleted, deleted_at
 FROM branches
 WHERE project_id = ?1
-  AND (updated_at < ?2 is null or updated_at < ?2 OR (updated_at = ?2 AND id < ?3))
+  AND (?2 is null or updated_at < ?2 OR (updated_at = ?2 AND id < ?3))
 ORDER BY updated_at DESC, id DESC
 LIMIT ?4
 `
 
 type BranchListParams struct {
-	ProjectID     int64        `json:"project_id"`
-	LastUpdatedAt sql.NullTime `json:"last_updated_at"`
-	LastID        int64        `json:"last_id"`
-	Limit         int64        `json:"limit"`
+	ProjectID     int64       `json:"project_id"`
+	LastUpdatedAt interface{} `json:"last_updated_at"`
+	LastID        int64       `json:"last_id"`
+	Limit         int64       `json:"limit"`
 }
 
 func (q *Queries) BranchList(ctx context.Context, arg BranchListParams) ([]Branch, error) {
@@ -65,10 +95,13 @@ func (q *Queries) BranchList(ctx context.Context, arg BranchListParams) ([]Branc
 			&i.ID,
 			&i.ProjectID,
 			&i.Name,
+			&i.Key,
 			&i.Protected,
 			&i.CommitID,
 			&i.UpdatedAt,
 			&i.CreatedAt,
+			&i.Deleted,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -84,11 +117,12 @@ func (q *Queries) BranchList(ctx context.Context, arg BranchListParams) ([]Branc
 }
 
 const branchUpdate = `-- name: BranchUpdate :exec
-UPDATE branches SET name = ?, commit_id = ?, protected = ? WHERE id = ?
+UPDATE branches SET name = ?, key = ?, commit_id = ?, protected = ? WHERE id = ?
 `
 
 type BranchUpdateParams struct {
 	Name      string        `json:"name"`
+	Key       string        `json:"key"`
 	CommitID  sql.NullInt64 `json:"commit_id"`
 	Protected bool          `json:"protected"`
 	ID        int64         `json:"id"`
@@ -97,6 +131,7 @@ type BranchUpdateParams struct {
 func (q *Queries) BranchUpdate(ctx context.Context, arg BranchUpdateParams) error {
 	_, err := q.db.ExecContext(ctx, branchUpdate,
 		arg.Name,
+		arg.Key,
 		arg.CommitID,
 		arg.Protected,
 		arg.ID,

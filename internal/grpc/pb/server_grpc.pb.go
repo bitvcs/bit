@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	NipaService_GetListBranch_FullMethodName   = "/greet.NipaService/GetListBranch"
+	NipaService_GetBranch_FullMethodName       = "/greet.NipaService/GetBranch"
 	NipaService_GetTreeManifest_FullMethodName = "/greet.NipaService/GetTreeManifest"
 )
 
@@ -28,6 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NipaServiceClient interface {
 	GetListBranch(ctx context.Context, in *GetListBranchRequest, opts ...grpc.CallOption) (*GetListBranchResponse, error)
+	GetBranch(ctx context.Context, in *GetBranchRequest, opts ...grpc.CallOption) (*GetBranchResponse, error)
 	GetTreeManifest(ctx context.Context, in *GetTreeManifestRequest, opts ...grpc.CallOption) (*GetTreeManifestResponse, error)
 }
 
@@ -49,6 +51,16 @@ func (c *nipaServiceClient) GetListBranch(ctx context.Context, in *GetListBranch
 	return out, nil
 }
 
+func (c *nipaServiceClient) GetBranch(ctx context.Context, in *GetBranchRequest, opts ...grpc.CallOption) (*GetBranchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetBranchResponse)
+	err := c.cc.Invoke(ctx, NipaService_GetBranch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *nipaServiceClient) GetTreeManifest(ctx context.Context, in *GetTreeManifestRequest, opts ...grpc.CallOption) (*GetTreeManifestResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetTreeManifestResponse)
@@ -64,6 +76,7 @@ func (c *nipaServiceClient) GetTreeManifest(ctx context.Context, in *GetTreeMani
 // for forward compatibility.
 type NipaServiceServer interface {
 	GetListBranch(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error)
+	GetBranch(context.Context, *GetBranchRequest) (*GetBranchResponse, error)
 	GetTreeManifest(context.Context, *GetTreeManifestRequest) (*GetTreeManifestResponse, error)
 	mustEmbedUnimplementedNipaServiceServer()
 }
@@ -77,6 +90,9 @@ type UnimplementedNipaServiceServer struct{}
 
 func (UnimplementedNipaServiceServer) GetListBranch(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetListBranch not implemented")
+}
+func (UnimplementedNipaServiceServer) GetBranch(context.Context, *GetBranchRequest) (*GetBranchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetBranch not implemented")
 }
 func (UnimplementedNipaServiceServer) GetTreeManifest(context.Context, *GetTreeManifestRequest) (*GetTreeManifestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTreeManifest not implemented")
@@ -120,6 +136,24 @@ func _NipaService_GetListBranch_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NipaService_GetBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetBranchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NipaServiceServer).GetBranch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NipaService_GetBranch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NipaServiceServer).GetBranch(ctx, req.(*GetBranchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NipaService_GetTreeManifest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTreeManifestRequest)
 	if err := dec(in); err != nil {
@@ -148,6 +182,10 @@ var NipaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetListBranch",
 			Handler:    _NipaService_GetListBranch_Handler,
+		},
+		{
+			MethodName: "GetBranch",
+			Handler:    _NipaService_GetBranch_Handler,
 		},
 		{
 			MethodName: "GetTreeManifest",

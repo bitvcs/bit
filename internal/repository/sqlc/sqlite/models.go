@@ -13,10 +13,13 @@ type Branch struct {
 	ID        int64         `json:"id"`
 	ProjectID int64         `json:"project_id"`
 	Name      string        `json:"name"`
+	Key       string        `json:"key"`
 	Protected bool          `json:"protected"`
 	CommitID  sql.NullInt64 `json:"commit_id"`
-	UpdatedAt sql.NullTime  `json:"updated_at"`
-	CreatedAt sql.NullTime  `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
+	CreatedAt time.Time     `json:"created_at"`
+	Deleted   bool          `json:"deleted"`
+	DeletedAt sql.NullTime  `json:"deleted_at"`
 }
 
 type Chunk struct {
@@ -35,7 +38,7 @@ type Commit struct {
 	Parent2ID sql.NullInt64 `json:"parent_2_id"`
 	UserID    int64         `json:"user_id"`
 	Message   string        `json:"message"`
-	CreatedAt sql.NullTime  `json:"created_at"`
+	CreatedAt time.Time     `json:"created_at"`
 }
 
 type File struct {

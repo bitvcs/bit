@@ -66,10 +66,13 @@ type Commit struct {
 }
 
 type Branch struct {
-	ID        snow.ID   `json:"id"`
-	ProjectID snow.ID   `json:"project_id"`
-	Name      string    `json:"name"`
-	CommitID  snow.ID   `json:"commit_id"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        snow.ID    `json:"id"`
+	ProjectID snow.ID    `json:"project_id"`
+	Name      string     `json:"name"`
+	Protected bool       `json:"protected"`
+	CommitID  *snow.ID   `json:"commit_id"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	CreatedAt time.Time  `json:"created_at"`
+	Deleted   bool       `json:"deleted"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }

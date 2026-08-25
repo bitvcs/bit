@@ -120,3 +120,18 @@ func (a *Auth) generateLoginResult(ctx context.Context, user *domain.User) (*dto
 		TokenType:    "Bearer",
 	}, nil
 }
+
+func (a *Auth) HasProjectAccess(ctx context.Context, projectID snow.ID, permission domain.Permission) bool {
+	claim, ok := domain.ClaimFromContext(ctx)
+	if !ok {
+		return false
+	}
+
+	if claim.IsSuperAdmin || claim.IsAdmin {
+		return true
+	}
+
+	//TODO: check PBAC rules for the user and projectID with the required permission
+
+	return false
+}

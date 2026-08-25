@@ -6,8 +6,8 @@ option go_package = "./pb";
 import "google/protobuf/timestamp.proto";
 
 message ProjectContext {
-    string org = 1;
-    string project = 2;
+    string org_id = 1;
+    string project_id = 2;
 }
 
 enum FileMode {
@@ -44,25 +44,36 @@ message GetTreeManifestResponse {
 }
 
 message Branch {
-    string id = 1;
-    string name = 2;
-    string commit_id = 3;
-    google.protobuf.Timestamp created_at = 4;
-    google.protobuf.Timestamp updated_at = 5;
+    google.protobuf.Timestamp created_at = 1;
+    google.protobuf.Timestamp updated_at = 2;
+    string id = 3;
+    string name = 4;
+    string commit_id = 5;
+    bool protected = 6;
 }
 
 message GetListBranchRequest {
     ProjectContext context = 1;
-    int64 limit = 2;
-    string cursor = 3;
+    int32 limit = 2;
+    optional google.protobuf.Timestamp last_updated_at = 3;
+    optional string last_id = 4;
 }
 
 message GetListBranchResponse {
-    string next_cursor = 1;
-    repeated Branch branches = 2;
+    repeated Branch branches = 1;
+}
+
+message GetBranchRequest {
+    ProjectContext context = 1;
+    string branch_id = 2;
+}
+
+message GetBranchResponse {
+    Branch branch = 1;
 }
 
 service NipaService {
     rpc GetListBranch(GetListBranchRequest) returns (GetListBranchResponse);
+    rpc GetBranch(GetBranchRequest) returns (GetBranchResponse);
     rpc GetTreeManifest(GetTreeManifestRequest) returns (GetTreeManifestResponse);
 }

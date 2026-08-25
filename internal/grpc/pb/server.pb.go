@@ -76,8 +76,8 @@ func (FileMode) EnumDescriptor() ([]byte, []int) {
 
 type ProjectContext struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Org           string                 `protobuf:"bytes,1,opt,name=org,proto3" json:"org,omitempty"`
-	Project       string                 `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
+	OrgId         string                 `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -112,16 +112,16 @@ func (*ProjectContext) Descriptor() ([]byte, []int) {
 	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ProjectContext) GetOrg() string {
+func (x *ProjectContext) GetOrgId() string {
 	if x != nil {
-		return x.Org
+		return x.OrgId
 	}
 	return ""
 }
 
-func (x *ProjectContext) GetProject() string {
+func (x *ProjectContext) GetProjectId() string {
 	if x != nil {
-		return x.Project
+		return x.ProjectId
 	}
 	return ""
 }
@@ -384,11 +384,12 @@ func (x *GetTreeManifestResponse) GetRootTree() *TreeManifest {
 
 type Branch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	CommitId      string                 `protobuf:"bytes,3,opt,name=commit_id,json=commitId,proto3" json:"commit_id,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Id            string                 `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	CommitId      string                 `protobuf:"bytes,5,opt,name=commit_id,json=commitId,proto3" json:"commit_id,omitempty"`
+	Protected     bool                   `protobuf:"varint,6,opt,name=protected,proto3" json:"protected,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -423,6 +424,20 @@ func (*Branch) Descriptor() ([]byte, []int) {
 	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{5}
 }
 
+func (x *Branch) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *Branch) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
 func (x *Branch) GetId() string {
 	if x != nil {
 		return x.Id
@@ -444,25 +459,19 @@ func (x *Branch) GetCommitId() string {
 	return ""
 }
 
-func (x *Branch) GetCreatedAt() *timestamppb.Timestamp {
+func (x *Branch) GetProtected() bool {
 	if x != nil {
-		return x.CreatedAt
+		return x.Protected
 	}
-	return nil
-}
-
-func (x *Branch) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
+	return false
 }
 
 type GetListBranchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Context       *ProjectContext        `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
-	Limit         int64                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	Cursor        string                 `protobuf:"bytes,3,opt,name=cursor,proto3" json:"cursor,omitempty"`
+	Limit         int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	LastUpdatedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=last_updated_at,json=lastUpdatedAt,proto3,oneof" json:"last_updated_at,omitempty"`
+	LastId        *string                `protobuf:"bytes,4,opt,name=last_id,json=lastId,proto3,oneof" json:"last_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -504,24 +513,30 @@ func (x *GetListBranchRequest) GetContext() *ProjectContext {
 	return nil
 }
 
-func (x *GetListBranchRequest) GetLimit() int64 {
+func (x *GetListBranchRequest) GetLimit() int32 {
 	if x != nil {
 		return x.Limit
 	}
 	return 0
 }
 
-func (x *GetListBranchRequest) GetCursor() string {
+func (x *GetListBranchRequest) GetLastUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Cursor
+		return x.LastUpdatedAt
+	}
+	return nil
+}
+
+func (x *GetListBranchRequest) GetLastId() string {
+	if x != nil && x.LastId != nil {
+		return *x.LastId
 	}
 	return ""
 }
 
 type GetListBranchResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NextCursor    string                 `protobuf:"bytes,1,opt,name=next_cursor,json=nextCursor,proto3" json:"next_cursor,omitempty"`
-	Branches      []*Branch              `protobuf:"bytes,2,rep,name=branches,proto3" json:"branches,omitempty"`
+	Branches      []*Branch              `protobuf:"bytes,1,rep,name=branches,proto3" json:"branches,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -556,16 +571,105 @@ func (*GetListBranchResponse) Descriptor() ([]byte, []int) {
 	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *GetListBranchResponse) GetNextCursor() string {
+func (x *GetListBranchResponse) GetBranches() []*Branch {
 	if x != nil {
-		return x.NextCursor
+		return x.Branches
+	}
+	return nil
+}
+
+type GetBranchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Context       *ProjectContext        `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
+	BranchId      string                 `protobuf:"bytes,2,opt,name=branch_id,json=branchId,proto3" json:"branch_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBranchRequest) Reset() {
+	*x = GetBranchRequest{}
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBranchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBranchRequest) ProtoMessage() {}
+
+func (x *GetBranchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBranchRequest.ProtoReflect.Descriptor instead.
+func (*GetBranchRequest) Descriptor() ([]byte, []int) {
+	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetBranchRequest) GetContext() *ProjectContext {
+	if x != nil {
+		return x.Context
+	}
+	return nil
+}
+
+func (x *GetBranchRequest) GetBranchId() string {
+	if x != nil {
+		return x.BranchId
 	}
 	return ""
 }
 
-func (x *GetListBranchResponse) GetBranches() []*Branch {
+type GetBranchResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Branch        *Branch                `protobuf:"bytes,1,opt,name=branch,proto3" json:"branch,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetBranchResponse) Reset() {
+	*x = GetBranchResponse{}
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetBranchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetBranchResponse) ProtoMessage() {}
+
+func (x *GetBranchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_grpc_proto_server_proto_msgTypes[9]
 	if x != nil {
-		return x.Branches
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetBranchResponse.ProtoReflect.Descriptor instead.
+func (*GetBranchResponse) Descriptor() ([]byte, []int) {
+	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *GetBranchResponse) GetBranch() *Branch {
+	if x != nil {
+		return x.Branch
 	}
 	return nil
 }
@@ -574,10 +678,11 @@ var File_internal_grpc_proto_server_proto protoreflect.FileDescriptor
 
 const file_internal_grpc_proto_server_proto_rawDesc = "" +
 	"\n" +
-	" internal/grpc/proto/server.proto\x12\x05greet\x1a\x1fgoogle/protobuf/timestamp.proto\"<\n" +
-	"\x0eProjectContext\x12\x10\n" +
-	"\x03org\x18\x01 \x01(\tR\x03org\x12\x18\n" +
-	"\aproject\x18\x02 \x01(\tR\aproject\"\xa2\x01\n" +
+	" internal/grpc/proto/server.proto\x12\x05greet\x1a\x1fgoogle/protobuf/timestamp.proto\"F\n" +
+	"\x0eProjectContext\x12\x15\n" +
+	"\x06org_id\x18\x01 \x01(\tR\x05orgId\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\"\xa2\x01\n" +
 	"\bFileNode\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12#\n" +
 	"\x04mode\x18\x02 \x01(\x0e2\x0f.greet.FileModeR\x04mode\x12\x1d\n" +
@@ -598,30 +703,39 @@ const file_internal_grpc_proto_server_proto_rawDesc = "" +
 	"\n" +
 	"_tree_hash\"K\n" +
 	"\x17GetTreeManifestResponse\x120\n" +
-	"\troot_tree\x18\x01 \x01(\v2\x13.greet.TreeManifestR\brootTree\"\xbf\x01\n" +
-	"\x06Branch\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
-	"\tcommit_id\x18\x03 \x01(\tR\bcommitId\x129\n" +
+	"\troot_tree\x18\x01 \x01(\v2\x13.greet.TreeManifestR\brootTree\"\xdd\x01\n" +
+	"\x06Branch\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"u\n" +
+	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x04 \x01(\tR\x04name\x12\x1b\n" +
+	"\tcommit_id\x18\x05 \x01(\tR\bcommitId\x12\x1c\n" +
+	"\tprotected\x18\x06 \x01(\bR\tprotected\"\xe4\x01\n" +
 	"\x14GetListBranchRequest\x12/\n" +
 	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x03R\x05limit\x12\x16\n" +
-	"\x06cursor\x18\x03 \x01(\tR\x06cursor\"c\n" +
-	"\x15GetListBranchResponse\x12\x1f\n" +
-	"\vnext_cursor\x18\x01 \x01(\tR\n" +
-	"nextCursor\x12)\n" +
-	"\bbranches\x18\x02 \x03(\v2\r.greet.BranchR\bbranches*r\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12G\n" +
+	"\x0flast_updated_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\rlastUpdatedAt\x88\x01\x01\x12\x1c\n" +
+	"\alast_id\x18\x04 \x01(\tH\x01R\x06lastId\x88\x01\x01B\x12\n" +
+	"\x10_last_updated_atB\n" +
+	"\n" +
+	"\b_last_id\"B\n" +
+	"\x15GetListBranchResponse\x12)\n" +
+	"\bbranches\x18\x01 \x03(\v2\r.greet.BranchR\bbranches\"`\n" +
+	"\x10GetBranchRequest\x12/\n" +
+	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x1b\n" +
+	"\tbranch_id\x18\x02 \x01(\tR\bbranchId\":\n" +
+	"\x11GetBranchResponse\x12%\n" +
+	"\x06branch\x18\x01 \x01(\v2\r.greet.BranchR\x06branch*r\n" +
 	"\bFileMode\x12\x19\n" +
 	"\x15FILE_MODE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13FILE_MODE_READ_ONLY\x10\x01\x12\x18\n" +
 	"\x14FILE_MODE_READ_WRITE\x10\x02\x12\x18\n" +
-	"\x14FILE_MODE_EXECUTABLE\x10\x032\xab\x01\n" +
+	"\x14FILE_MODE_EXECUTABLE\x10\x032\xeb\x01\n" +
 	"\vNipaService\x12J\n" +
-	"\rGetListBranch\x12\x1b.greet.GetListBranchRequest\x1a\x1c.greet.GetListBranchResponse\x12P\n" +
+	"\rGetListBranch\x12\x1b.greet.GetListBranchRequest\x1a\x1c.greet.GetListBranchResponse\x12>\n" +
+	"\tGetBranch\x12\x17.greet.GetBranchRequest\x1a\x18.greet.GetBranchResponse\x12P\n" +
 	"\x0fGetTreeManifest\x12\x1d.greet.GetTreeManifestRequest\x1a\x1e.greet.GetTreeManifestResponseB\x06Z\x04./pbb\x06proto3"
 
 var (
@@ -637,7 +751,7 @@ func file_internal_grpc_proto_server_proto_rawDescGZIP() []byte {
 }
 
 var file_internal_grpc_proto_server_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_internal_grpc_proto_server_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_internal_grpc_proto_server_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_internal_grpc_proto_server_proto_goTypes = []any{
 	(FileMode)(0),                   // 0: greet.FileMode
 	(*ProjectContext)(nil),          // 1: greet.ProjectContext
@@ -648,7 +762,9 @@ var file_internal_grpc_proto_server_proto_goTypes = []any{
 	(*Branch)(nil),                  // 6: greet.Branch
 	(*GetListBranchRequest)(nil),    // 7: greet.GetListBranchRequest
 	(*GetListBranchResponse)(nil),   // 8: greet.GetListBranchResponse
-	(*timestamppb.Timestamp)(nil),   // 9: google.protobuf.Timestamp
+	(*GetBranchRequest)(nil),        // 9: greet.GetBranchRequest
+	(*GetBranchResponse)(nil),       // 10: greet.GetBranchResponse
+	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
 }
 var file_internal_grpc_proto_server_proto_depIdxs = []int32{
 	0,  // 0: greet.FileNode.mode:type_name -> greet.FileMode
@@ -656,19 +772,24 @@ var file_internal_grpc_proto_server_proto_depIdxs = []int32{
 	2,  // 2: greet.TreeManifest.files:type_name -> greet.FileNode
 	1,  // 3: greet.GetTreeManifestRequest.context:type_name -> greet.ProjectContext
 	3,  // 4: greet.GetTreeManifestResponse.root_tree:type_name -> greet.TreeManifest
-	9,  // 5: greet.Branch.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 6: greet.Branch.updated_at:type_name -> google.protobuf.Timestamp
+	11, // 5: greet.Branch.created_at:type_name -> google.protobuf.Timestamp
+	11, // 6: greet.Branch.updated_at:type_name -> google.protobuf.Timestamp
 	1,  // 7: greet.GetListBranchRequest.context:type_name -> greet.ProjectContext
-	6,  // 8: greet.GetListBranchResponse.branches:type_name -> greet.Branch
-	7,  // 9: greet.NipaService.GetListBranch:input_type -> greet.GetListBranchRequest
-	4,  // 10: greet.NipaService.GetTreeManifest:input_type -> greet.GetTreeManifestRequest
-	8,  // 11: greet.NipaService.GetListBranch:output_type -> greet.GetListBranchResponse
-	5,  // 12: greet.NipaService.GetTreeManifest:output_type -> greet.GetTreeManifestResponse
-	11, // [11:13] is the sub-list for method output_type
-	9,  // [9:11] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	11, // 8: greet.GetListBranchRequest.last_updated_at:type_name -> google.protobuf.Timestamp
+	6,  // 9: greet.GetListBranchResponse.branches:type_name -> greet.Branch
+	1,  // 10: greet.GetBranchRequest.context:type_name -> greet.ProjectContext
+	6,  // 11: greet.GetBranchResponse.branch:type_name -> greet.Branch
+	7,  // 12: greet.NipaService.GetListBranch:input_type -> greet.GetListBranchRequest
+	9,  // 13: greet.NipaService.GetBranch:input_type -> greet.GetBranchRequest
+	4,  // 14: greet.NipaService.GetTreeManifest:input_type -> greet.GetTreeManifestRequest
+	8,  // 15: greet.NipaService.GetListBranch:output_type -> greet.GetListBranchResponse
+	10, // 16: greet.NipaService.GetBranch:output_type -> greet.GetBranchResponse
+	5,  // 17: greet.NipaService.GetTreeManifest:output_type -> greet.GetTreeManifestResponse
+	15, // [15:18] is the sub-list for method output_type
+	12, // [12:15] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_internal_grpc_proto_server_proto_init() }
@@ -677,13 +798,14 @@ func file_internal_grpc_proto_server_proto_init() {
 		return
 	}
 	file_internal_grpc_proto_server_proto_msgTypes[3].OneofWrappers = []any{}
+	file_internal_grpc_proto_server_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_grpc_proto_server_proto_rawDesc), len(file_internal_grpc_proto_server_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

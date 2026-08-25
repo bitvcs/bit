@@ -24,3 +24,17 @@ func nullTimePtr(t sql.NullTime) *time.Time {
 	}
 	return &t.Time
 }
+
+func nullInt64Ptr(i sql.NullInt64) *int64 {
+	if !i.Valid {
+		return nil
+	}
+	return &i.Int64
+}
+
+func timePtrToNullTime(t *time.Time) sql.NullTime {
+	if t == nil {
+		return sql.NullTime{Valid: false}
+	}
+	return sql.NullTime{Time: *t, Valid: true}
+}

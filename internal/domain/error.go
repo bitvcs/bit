@@ -21,6 +21,14 @@ func (e *Error) String() string {
 }
 
 func IsErrorNotFound(err error) bool {
+	return isDomainError(err, 404)
+}
+
+func IsErrorNoPermission(err error) bool {
+	return isDomainError(err, 403)
+}
+
+func isDomainError(err error, code int) bool {
 	if err == nil {
 		return false
 	}
@@ -28,7 +36,7 @@ func IsErrorNotFound(err error) bool {
 	if !ok {
 		return false
 	}
-	return e.Code == 404
+	return e.Code == code
 }
 
 func NewErrorRecordNotFound() *Error {

@@ -61,7 +61,9 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	grpcRegistrar := grpc.NewServer()
+	grpcInterceptor := server.NewInterceptor(reg.Auth())
+
+	grpcRegistrar := grpc.NewServer(grpc.UnaryInterceptor(grpcInterceptor.JWTUnary()))
 	grpcServer := server.New(reg)
 	pb.RegisterNipaServiceServer(grpcRegistrar, grpcServer)
 
