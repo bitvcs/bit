@@ -19,15 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NipaService_GetListBranch_FullMethodName   = "/greet.NipaService/GetListBranch"
-	NipaService_GetBranch_FullMethodName       = "/greet.NipaService/GetBranch"
-	NipaService_GetTreeManifest_FullMethodName = "/greet.NipaService/GetTreeManifest"
+	NipaService_LoginWithUsernamePassword_FullMethodName = "/greet.NipaService/LoginWithUsernamePassword"
+	NipaService_LoginWithRefreshToken_FullMethodName     = "/greet.NipaService/LoginWithRefreshToken"
+	NipaService_GetListBranch_FullMethodName             = "/greet.NipaService/GetListBranch"
+	NipaService_GetBranch_FullMethodName                 = "/greet.NipaService/GetBranch"
+	NipaService_GetTreeManifest_FullMethodName           = "/greet.NipaService/GetTreeManifest"
 )
 
 // NipaServiceClient is the client API for NipaService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NipaServiceClient interface {
+	LoginWithUsernamePassword(ctx context.Context, in *LoginUsernamePasswordRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	LoginWithRefreshToken(ctx context.Context, in *LoginWithRefreshRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GetListBranch(ctx context.Context, in *GetListBranchRequest, opts ...grpc.CallOption) (*GetListBranchResponse, error)
 	GetBranch(ctx context.Context, in *GetBranchRequest, opts ...grpc.CallOption) (*GetBranchResponse, error)
 	GetTreeManifest(ctx context.Context, in *GetTreeManifestRequest, opts ...grpc.CallOption) (*GetTreeManifestResponse, error)
@@ -39,6 +43,26 @@ type nipaServiceClient struct {
 
 func NewNipaServiceClient(cc grpc.ClientConnInterface) NipaServiceClient {
 	return &nipaServiceClient{cc}
+}
+
+func (c *nipaServiceClient) LoginWithUsernamePassword(ctx context.Context, in *LoginUsernamePasswordRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, NipaService_LoginWithUsernamePassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nipaServiceClient) LoginWithRefreshToken(ctx context.Context, in *LoginWithRefreshRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, NipaService_LoginWithRefreshToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *nipaServiceClient) GetListBranch(ctx context.Context, in *GetListBranchRequest, opts ...grpc.CallOption) (*GetListBranchResponse, error) {
@@ -75,6 +99,8 @@ func (c *nipaServiceClient) GetTreeManifest(ctx context.Context, in *GetTreeMani
 // All implementations must embed UnimplementedNipaServiceServer
 // for forward compatibility.
 type NipaServiceServer interface {
+	LoginWithUsernamePassword(context.Context, *LoginUsernamePasswordRequest) (*LoginResponse, error)
+	LoginWithRefreshToken(context.Context, *LoginWithRefreshRequest) (*LoginResponse, error)
 	GetListBranch(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error)
 	GetBranch(context.Context, *GetBranchRequest) (*GetBranchResponse, error)
 	GetTreeManifest(context.Context, *GetTreeManifestRequest) (*GetTreeManifestResponse, error)
@@ -88,6 +114,12 @@ type NipaServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedNipaServiceServer struct{}
 
+func (UnimplementedNipaServiceServer) LoginWithUsernamePassword(context.Context, *LoginUsernamePasswordRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithUsernamePassword not implemented")
+}
+func (UnimplementedNipaServiceServer) LoginWithRefreshToken(context.Context, *LoginWithRefreshRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LoginWithRefreshToken not implemented")
+}
 func (UnimplementedNipaServiceServer) GetListBranch(context.Context, *GetListBranchRequest) (*GetListBranchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetListBranch not implemented")
 }
@@ -116,6 +148,42 @@ func RegisterNipaServiceServer(s grpc.ServiceRegistrar, srv NipaServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&NipaService_ServiceDesc, srv)
+}
+
+func _NipaService_LoginWithUsernamePassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginUsernamePasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NipaServiceServer).LoginWithUsernamePassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NipaService_LoginWithUsernamePassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NipaServiceServer).LoginWithUsernamePassword(ctx, req.(*LoginUsernamePasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NipaService_LoginWithRefreshToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginWithRefreshRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NipaServiceServer).LoginWithRefreshToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NipaService_LoginWithRefreshToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NipaServiceServer).LoginWithRefreshToken(ctx, req.(*LoginWithRefreshRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _NipaService_GetListBranch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -179,6 +247,14 @@ var NipaService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "greet.NipaService",
 	HandlerType: (*NipaServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "LoginWithUsernamePassword",
+			Handler:    _NipaService_LoginWithUsernamePassword_Handler,
+		},
+		{
+			MethodName: "LoginWithRefreshToken",
+			Handler:    _NipaService_LoginWithRefreshToken_Handler,
+		},
 		{
 			MethodName: "GetListBranch",
 			Handler:    _NipaService_GetListBranch_Handler,

@@ -20,8 +20,8 @@ type mockUsecaseContainer struct {
 	branch *usecase.Branch
 }
 
-func (m *mockUsecaseContainer) Auth() *usecase.Auth   { return nil }
-func (m *mockUsecaseContainer) User() *usecase.User   { return nil }
+func (m *mockUsecaseContainer) Auth() *usecase.Auth     { return nil }
+func (m *mockUsecaseContainer) User() *usecase.User     { return nil }
 func (m *mockUsecaseContainer) Branch() *usecase.Branch { return m.branch }
 
 func mustBase36(id snow.ID) string {
@@ -283,4 +283,3 @@ func timePtrToTimestamp(t *time.Time) *timestamppb.Timestamp {
 	}
 	return timestamppb.New(*t)
 }
-

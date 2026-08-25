@@ -72,7 +72,25 @@ message GetBranchResponse {
     Branch branch = 1;
 }
 
+message LoginUsernamePasswordRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginWithRefreshRequest {
+    string refresh_token = 1;
+}
+
+message LoginResponse {
+    string access_token = 1;
+    string refresh_token = 2;
+    int32 expires_in = 3;
+}
+
 service NipaService {
+    rpc LoginWithUsernamePassword(LoginUsernamePasswordRequest) returns (LoginResponse);
+    rpc LoginWithRefreshToken(LoginWithRefreshRequest) returns (LoginResponse);
+
     rpc GetListBranch(GetListBranchRequest) returns (GetListBranchResponse);
     rpc GetBranch(GetBranchRequest) returns (GetBranchResponse);
     rpc GetTreeManifest(GetTreeManifestRequest) returns (GetTreeManifestResponse);
