@@ -57,3 +57,5 @@ CREATE TABLE refresh_tokens (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+INSERT INTO users (id, name, email, password, is_super_admin) VALUES (1, 'Super Admin', 'supernipa', 'supernipa', 1);

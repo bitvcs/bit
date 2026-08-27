@@ -49,7 +49,8 @@ message Branch {
     string id = 3;
     string name = 4;
     string commit_id = 5;
-    bool protected = 6;
+    bool is_protected = 6;
+    bool is_default = 7;
 }
 
 message GetListBranchRequest {

@@ -35,6 +35,14 @@ func (b *BranchRepository) ListBranches(ctx context.Context, projectID snow.ID, 
 	}), nil
 }
 
+func (b *BranchRepository) GetDefaultBranch(ctx context.Context, projectID snow.ID) (*domain.Branch, error) {
+	row, err := b.queries.BranchGetDefault(ctx, projectID.Int64())
+	if err != nil {
+		return nil, handleError(err)
+	}
+	return branchToDomain(row), nil
+}
+
 func (b *BranchRepository) GetByProjectIDAndID(ctx context.Context, projectID snow.ID, branchID snow.ID) (*domain.Branch, error) {
 	row, err := b.queries.BranchGet(ctx, sqlcSqlite.BranchGetParams{
 		ProjectID: projectID.Int64(),
@@ -53,14 +61,15 @@ func branchToDomain(b sqlcSqlite.Branch) *domain.Branch {
 		commitID = &id
 	}
 	return &domain.Branch{
-		ID:        snow.ID(b.ID),
-		ProjectID: snow.ID(b.ProjectID),
-		Name:      b.Name,
-		Protected: b.Protected,
-		CommitID:  commitID,
-		UpdatedAt: b.UpdatedAt,
-		CreatedAt: b.CreatedAt,
-		Deleted:   b.Deleted,
-		DeletedAt: nullTimePtr(b.DeletedAt),
+		ID:          snow.ID(b.ID),
+		ProjectID:   snow.ID(b.ProjectID),
+		Name:        b.Name,
+		IsProtected: b.IsProtected,
+		IsDefault:   b.IsDefault,
+		CommitID:    commitID,
+		UpdatedAt:   b.UpdatedAt,
+		CreatedAt:   b.CreatedAt,
+		Deleted:     b.Deleted,
+		DeletedAt:   nullTimePtr(b.DeletedAt),
 	}
 }

@@ -11,7 +11,9 @@ import (
 type Querier interface {
 	BranchCreate(ctx context.Context, arg BranchCreateParams) error
 	BranchGet(ctx context.Context, arg BranchGetParams) (Branch, error)
+	BranchGetDefault(ctx context.Context, projectID int64) (Branch, error)
 	BranchList(ctx context.Context, arg BranchListParams) ([]Branch, error)
+	BranchRemoveDefault(ctx context.Context, projectID int64) error
 	BranchUpdate(ctx context.Context, arg BranchUpdateParams) error
 	CreateOrganization(ctx context.Context, arg CreateOrganizationParams) (Organization, error)
 	CreateProject(ctx context.Context, arg CreateProjectParams) (Project, error)

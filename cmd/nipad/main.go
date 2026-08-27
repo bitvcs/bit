@@ -68,14 +68,20 @@ func main() {
 	pb.RegisterNipaServiceServer(grpcRegistrar, grpcServer)
 
 	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		slog.Info("incoming connection", "content", r.Header.Get("Content-Type"), "method", r.Method, "url", r.URL.String(), "ProtoMajor", r.ProtoMajor)
 		if r.ProtoMajor == 2 && strings.HasPrefix(r.Header.Get("Content-Type"), "application/grpc") {
+			slog.Info("grpc connection is coming")
 			grpcRegistrar.ServeHTTP(w, r)
 		} else {
 			container.ServeHTTP(w, r)
 		}
 	})
 
-	httpServer := &http.Server{Addr: address, Handler: mainHandler}
+	protocols := new(http.Protocols)
+	protocols.SetHTTP1(true)
+	protocols.SetUnencryptedHTTP2(true)
+
+	httpServer := &http.Server{Addr: address, Handler: mainHandler, Protocols: protocols}
 	ln, err := net.Listen("tcp", address)
 	if err != nil {
 		panic(err)

@@ -1,8 +1,17 @@
 -- name: BranchCreate :exec
-INSERT INTO branches (id, project_id, name, commit_id) VALUES (?, ?, ?, ?);
+INSERT INTO branches (id, project_id, name, commit_id, is_default, is_protected) VALUES (?, ?, ?, ?, ?, ?);
 
 -- name: BranchUpdate :exec
-UPDATE branches SET name = ?, key = ?, commit_id = ?, protected = ? WHERE id = :id;
+UPDATE branches SET name = ?, key = ?, commit_id = ?, is_protected = ?, is_default = ? WHERE id = :id;
+
+-- name: BranchRemoveDefault :exec
+UPDATE branches SET is_default = FALSE WHERE project_id = :project_id AND is_default = TRUE;
+
+-- name: BranchGetDefault :one
+SELECT *
+FROM branches
+WHERE project_id = :project_id AND is_default = TRUE
+LIMIT 1;
 
 -- name: BranchList :many
 SELECT *

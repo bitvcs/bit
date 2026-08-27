@@ -60,11 +60,12 @@ func (n *nipaServer) GetBranch(ctx context.Context, req *pb.GetBranchRequest) (*
 
 func domainBranchToPB(branch *domain.Branch) *pb.Branch {
 	return &pb.Branch{
-		Id:        branch.ID.Base36(),
-		Name:      branch.Name,
-		Protected: branch.Protected,
-		CommitId:  branch.CommitID.Base36(),
-		UpdatedAt: timestamppb.New(branch.UpdatedAt),
-		CreatedAt: timestamppb.New(branch.CreatedAt),
+		Id:          branch.ID.Base36(),
+		Name:        branch.Name,
+		IsProtected: branch.IsProtected,
+		IsDefault:   branch.IsDefault,
+		CommitId:    branch.CommitID.Base36(),
+		UpdatedAt:   timestamppb.New(branch.UpdatedAt),
+		CreatedAt:   timestamppb.New(branch.CreatedAt),
 	}
 }

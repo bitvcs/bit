@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/nipalab/nipa/internal/domain"
 	"google.golang.org/grpc"
@@ -27,7 +28,8 @@ func NewInterceptor(tokenValidator tokenValidator) *Interceptor {
 func (i *Interceptor) JWTUnary() func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
-		if info.FullMethod == "/nipa.AuthService/Login" || info.FullMethod == "/nipa.AuthService/RefreshToken" || info.FullMethod == "/nipa.AuthService/health" {
+		slog.Info("method", "name", info.FullMethod)
+		if info.FullMethod == "/greet.NipaService/LoginWithUsernamePassword" || info.FullMethod == "/greet.NipaService/LoginWithRefreshToken" || info.FullMethod == "/nipa.AuthService/health" {
 			return handler(ctx, req)
 		}
 
