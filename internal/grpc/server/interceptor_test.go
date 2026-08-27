@@ -34,8 +34,8 @@ func unaryHandler(t *testing.T) grpc.UnaryHandler {
 func TestInterceptor_PublicRoutes(t *testing.T) {
 	handler := unaryHandler(t)
 	publicRoutes := []string{
-		"/nipa.AuthService/Login",
-		"/nipa.AuthService/RefreshToken",
+		"/greet.NipaService/LoginWithUsernamePassword",
+		"/greet.NipaService/LoginWithRefreshToken",
 		"/nipa.AuthService/health",
 	}
 

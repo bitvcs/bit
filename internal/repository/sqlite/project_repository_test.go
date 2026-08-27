@@ -48,7 +48,7 @@ func TestProjectRepositorySQLite(t *testing.T) {
 
 	projects, err := repo.ListByOrgID(ctx, 1)
 	require.NoError(t, err)
-	require.Len(t, projects, 2)
+	require.Len(t, projects, 3)
 
 	created2, err := repo.Create(ctx, domain.Project{ID: snowNode.Generate(), OrgID: 1, Name: "project-c", Description: "third"})
 	require.NoError(t, err)

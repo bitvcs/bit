@@ -118,6 +118,47 @@ func TestBranchRepositorySQLite_GetByProjectIDAndID_WrongProject(t *testing.T) {
 	requireRecordNotFound(t, err)
 }
 
+func TestBranchRepositorySQLite_InsertTwoDefaultBranchesFails(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+
+	projectID := seedProject(t, q, 1, "test-project")
+
+	node := newTestNode(t)
+	firstID := node.Generate()
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO branches (id, project_id, name, key, is_default) VALUES (?, ?, ?, ?, 1)`,
+		firstID.Int64(), projectID.Int64(), "main", "main",
+	)
+	require.NoError(t, err)
+
+	node = newTestNode(t)
+	secondID := node.Generate()
+	_, err = db.ExecContext(ctx,
+		`INSERT INTO branches (id, project_id, name, key, is_default) VALUES (?, ?, ?, ?, 1)`,
+		secondID.Int64(), projectID.Int64(), "develop", "develop",
+	)
+	require.Error(t, err)
+}
+
+func TestBranchRepositorySQLite_DefaultBranchPerProjectIsAllowed(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+
+	projectA := seedProject(t, q, 1, "project-a")
+	projectB := seedProject(t, q, 1, "project-b")
+
+	for _, projectID := range []snow.ID{projectA, projectB} {
+		node := newTestNode(t)
+		id := node.Generate()
+		_, err := db.ExecContext(ctx,
+			`INSERT INTO branches (id, project_id, name, key, is_default) VALUES (?, ?, ?, ?, 1)`,
+			id.Int64(), projectID.Int64(), "main", "main",
+		)
+		require.NoError(t, err)
+	}
+}
+
 func TestBranchRepositorySQLite_ListBranches(t *testing.T) {
 	ctx := context.Background()
 	db, q := newSQLiteTestDB(t)
