@@ -62,6 +62,25 @@ func (q *Queries) GetOrganization(ctx context.Context, id int64) (Organization, 
 	return i, err
 }
 
+const getOrganizationBySlug = `-- name: GetOrganizationBySlug :one
+SELECT id, slug, name, created_at, updated_at, deleted, deleted_at FROM organizations WHERE slug = ? AND deleted = false LIMIT 1
+`
+
+func (q *Queries) GetOrganizationBySlug(ctx context.Context, slug string) (Organization, error) {
+	row := q.db.QueryRowContext(ctx, getOrganizationBySlug, slug)
+	var i Organization
+	err := row.Scan(
+		&i.ID,
+		&i.Slug,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const listOrganizations = `-- name: ListOrganizations :many
 SELECT id, slug, name, created_at, updated_at, deleted, deleted_at FROM organizations WHERE deleted = false ORDER BY id
 `

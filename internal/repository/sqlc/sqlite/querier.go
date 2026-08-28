@@ -20,8 +20,10 @@ type Querier interface {
 	DeleteOrganization(ctx context.Context, id int64) error
 	DeleteProject(ctx context.Context, id int64) error
 	GetOrganization(ctx context.Context, id int64) (Organization, error)
+	GetOrganizationBySlug(ctx context.Context, slug string) (Organization, error)
 	GetProject(ctx context.Context, id int64) (Project, error)
 	GetProjectByOrgIDAndID(ctx context.Context, arg GetProjectByOrgIDAndIDParams) (Project, error)
+	GetProjectByOrgIDAndSlug(ctx context.Context, arg GetProjectByOrgIDAndSlugParams) (Project, error)
 	ListOrganizations(ctx context.Context) ([]Organization, error)
 	ListProjectsByOrgId(ctx context.Context, orgID int64) ([]Project, error)
 	RefreshTokenCreate(ctx context.Context, arg RefreshTokenCreateParams) (int64, error)

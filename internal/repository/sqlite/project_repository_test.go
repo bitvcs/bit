@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -56,4 +57,78 @@ func TestProjectRepositorySQLite(t *testing.T) {
 
 	_, err = repo.Get(ctx, created2.ID)
 	require.Error(t, err)
+}
+
+func TestProjectRepositorySQLite_GetByOrgIDAndSlug_Success(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewProjectRepository(db)
+
+	projectID := seedProject(t, q, 1, "project-a")
+
+	got, err := repo.GetByOrgIDAndSlug(ctx, 1, "project-a")
+	require.NoError(t, err)
+	require.Equal(t, projectID, got.ID)
+	require.Equal(t, snow.ID(1), got.OrgID)
+	require.Equal(t, "project-a", got.Slug)
+	require.Equal(t, "project-a", got.Name)
+}
+
+func TestProjectRepositorySQLite_GetByOrgIDAndSlug_NotFound(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewProjectRepository(db)
+
+	seedProject(t, q, 1, "project-a")
+
+	_, err := repo.GetByOrgIDAndSlug(ctx, 1, "does-not-exist")
+	require.ErrorIs(t, err, sql.ErrNoRows)
+}
+
+func TestProjectRepositorySQLite_GetByOrgIDAndSlug_WrongOrg(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewProjectRepository(db)
+
+	seedProject(t, q, 1, "project-a")
+
+	_, err := repo.GetByOrgIDAndSlug(ctx, 2, "project-a")
+	require.ErrorIs(t, err, sql.ErrNoRows)
+}
+
+func TestProjectRepositorySQLite_GetByOrgIDAndSlug_DeletedProject(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewProjectRepository(db)
+
+	projectID := seedProject(t, q, 1, "project-a")
+	require.NoError(t, repo.Delete(ctx, projectID))
+
+	_, err := repo.GetByOrgIDAndSlug(ctx, 1, "project-a")
+	require.ErrorIs(t, err, sql.ErrNoRows)
+}
+
+func TestProjectRepositorySQLite_GetByOrgIDAndSlug_SameSlugDifferentOrg(t *testing.T) {
+	ctx := context.Background()
+	db, _ := newSQLiteTestDB(t)
+	repo := NewProjectRepository(db)
+
+	node, err := snow.NewNode(1)
+	require.NoError(t, err)
+
+	org1ID := node.Generate()
+	org2ID := node.Generate()
+
+	_, err = repo.Create(ctx, domain.Project{ID: org1ID, OrgID: 1, Slug: "shared", Name: "org1-project"})
+	require.NoError(t, err)
+	_, err = repo.Create(ctx, domain.Project{ID: org2ID, OrgID: 2, Slug: "shared", Name: "org2-project"})
+	require.NoError(t, err)
+
+	got1, err := repo.GetByOrgIDAndSlug(ctx, 1, "shared")
+	require.NoError(t, err)
+	require.Equal(t, org1ID, got1.ID)
+
+	got2, err := repo.GetByOrgIDAndSlug(ctx, 2, "shared")
+	require.NoError(t, err)
+	require.Equal(t, org2ID, got2.ID)
 }
