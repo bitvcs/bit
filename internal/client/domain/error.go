@@ -21,3 +21,10 @@ func NewUserError(message string) *Error {
 		Message: message,
 	}
 }
+
+func NewTokenError(message string) *Error {
+	return &Error{
+		Code:    401,
+		Message: message,
+	}
+}

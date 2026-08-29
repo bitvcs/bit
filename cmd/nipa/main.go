@@ -1,20 +1,13 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
-	"time"
-
-	"github.com/nipalab/nipa/internal/grpc/pb"
-	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/nipalab/nipa/internal/client/cli"
+	"github.com/nipalab/nipa/internal/client/usecase"
 )
 
 func main() {
 
-	var rootCmd = &cobra.Command{
+	/*var rootCmd = &cobra.Command{
 		Use:   "nipa",
 		Short: "nipa is centralized version control system for your project",
 	}
@@ -57,5 +50,12 @@ func main() {
 		panic(err)
 	}
 
-	slog.Info("login successful", "access_token", res.AccessToken, "refresh_token", res.RefreshToken, "expires_in", res.ExpiresIn)
+	slog.Info("login successful", "access_token", res.AccessToken, "refresh_token", res.RefreshToken, "expires_in", res.ExpiresIn)*/
+
+	registry := &Registry{
+		authUsecase: usecase.NewAuth(nil, nil),
+	}
+
+	cliClient := cli.NewCli(registry)
+	cliClient.Run()
 }
