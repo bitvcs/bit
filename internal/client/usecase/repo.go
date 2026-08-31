@@ -21,11 +21,3 @@ func (r *Repo) Clone(ctx context.Context, host, org, project, branch, path, targ
 	}
 	return nil
 }
-
-func (r *Repo) GetDefaultBranch(ctx context.Context, org, project string) (string, error) {
-	return "", nil
-}
-
-func (r *Repo) GetBranchList(ctx context.Context, org, project string) ([]string, error) {
-	return nil, nil
-}

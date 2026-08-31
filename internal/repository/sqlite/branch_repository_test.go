@@ -256,3 +256,101 @@ func TestBranchRepositorySQLite_ListBranches_Pagination(t *testing.T) {
 			(b.UpdatedAt.Equal(lastBranch.UpdatedAt) && b.ID < lastBranch.ID))
 	}
 }
+
+func TestBranchRepositorySQLite_GetDefaultBranch(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewBranchRepository(db)
+
+	projectID := seedProject(t, q, 1, "test-project")
+
+	node := newTestNode(t)
+	branchID := node.Generate()
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO branches (id, project_id, name, key, is_default) VALUES (?, ?, ?, ?, 1)`,
+		branchID.Int64(), projectID.Int64(), "main", "main",
+	)
+	require.NoError(t, err)
+
+	got, err := repo.GetDefaultBranch(ctx, projectID)
+	require.NoError(t, err)
+	require.Equal(t, branchID, got.ID)
+	require.Equal(t, projectID, got.ProjectID)
+	require.Equal(t, "main", got.Name)
+	require.True(t, got.IsDefault)
+	require.False(t, got.IsProtected)
+	require.Nil(t, got.CommitID)
+	require.False(t, got.Deleted)
+	require.Nil(t, got.DeletedAt)
+}
+
+func TestBranchRepositorySQLite_GetDefaultBranch_WithCommitID(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewBranchRepository(db)
+
+	projectID := seedProject(t, q, 1, "test-project")
+
+	node := newTestNode(t)
+	branchID := node.Generate()
+	commitID := node.Generate()
+
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO branches (id, project_id, name, key, is_default, commit_id) VALUES (?, ?, ?, ?, 1, ?)`,
+		branchID.Int64(), projectID.Int64(), "main", "main", commitID.Int64(),
+	)
+	require.NoError(t, err)
+
+	got, err := repo.GetDefaultBranch(ctx, projectID)
+	require.NoError(t, err)
+	require.NotNil(t, got.CommitID)
+	require.Equal(t, commitID, *got.CommitID)
+}
+
+func TestBranchRepositorySQLite_GetDefaultBranch_NoBranches(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewBranchRepository(db)
+
+	projectID := seedProject(t, q, 1, "test-project")
+
+	_, err := repo.GetDefaultBranch(ctx, projectID)
+	requireRecordNotFound(t, err)
+}
+
+func TestBranchRepositorySQLite_GetDefaultBranch_NoneDefault(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewBranchRepository(db)
+
+	projectID := seedProject(t, q, 1, "test-project")
+	seedBranch(t, db, projectID, "main", sql.NullInt64{})
+	seedBranch(t, db, projectID, "develop", sql.NullInt64{})
+
+	_, err := repo.GetDefaultBranch(ctx, projectID)
+	requireRecordNotFound(t, err)
+}
+
+func TestBranchRepositorySQLite_GetDefaultBranch_IsolatedPerProject(t *testing.T) {
+	ctx := context.Background()
+	db, q := newSQLiteTestDB(t)
+	repo := NewBranchRepository(db)
+
+	projectA := seedProject(t, q, 1, "project-a")
+	projectB := seedProject(t, q, 1, "project-b")
+
+	node := newTestNode(t)
+	branchID := node.Generate()
+	_, err := db.ExecContext(ctx,
+		`INSERT INTO branches (id, project_id, name, key, is_default) VALUES (?, ?, ?, ?, 1)`,
+		branchID.Int64(), projectA.Int64(), "main", "main",
+	)
+	require.NoError(t, err)
+
+	got, err := repo.GetDefaultBranch(ctx, projectA)
+	require.NoError(t, err)
+	require.Equal(t, branchID, got.ID)
+
+	_, err = repo.GetDefaultBranch(ctx, projectB)
+	requireRecordNotFound(t, err)
+}
