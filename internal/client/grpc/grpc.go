@@ -1,19 +1,31 @@
 package grpc
 
 import (
+	"context"
 	"log/slog"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
-type Client struct {
-	url        string
-	clientConn *grpc.ClientConn
+type tokenProvider interface {
+	LoginWithRefreshToken(ctx context.Context, host, refreshToken string) error
+	GetToken(ctx context.Context, host string) (string, error)
 }
 
-func NewClient() *Client {
-	return &Client{}
+type Client struct {
+	url           string
+	clientConn    *grpc.ClientConn
+	tokenProvider tokenProvider
+}
+
+func NewClient(tokenProvider tokenProvider) *Client {
+	return &Client{
+		tokenProvider: tokenProvider,
+	}
 }
 
 func (c *Client) Close() error {
@@ -32,11 +44,49 @@ func (c *Client) Connect(url string) error {
 		c.clientConn = nil
 		c.url = ""
 	}
-	conn, err := grpc.NewClient(url, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(url, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithUnaryInterceptor(c.unaryAuthInterceptor()))
 	if err != nil {
 		return err
 	}
 	c.url = url
 	c.clientConn = conn
 	return nil
+}
+
+func (c *Client) unaryAuthInterceptor() grpc.UnaryClientInterceptor {
+	return func(
+		ctx context.Context,
+		method string,
+		req, reply any,
+		cc *grpc.ClientConn,
+		invoker grpc.UnaryInvoker,
+		opts ...grpc.CallOption,
+	) error {
+		if method == "/greet.NipaService/LoginWithUsernamePassword" || method == "/greet.NipaService/LoginWithRefreshToken" {
+			return invoker(ctx, method, req, reply, cc, opts...)
+		}
+
+		accToken, err := c.tokenProvider.GetToken(ctx, c.url)
+		if err != nil {
+			return status.Error(codes.Unauthenticated, "unable to get access token")
+		}
+		authCtx := metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+accToken)
+
+		err = invoker(authCtx, method, req, reply, cc, opts...)
+		if status.Code(err) != codes.Unauthenticated {
+			return err
+		}
+
+		err = c.tokenProvider.LoginWithRefreshToken(ctx, c.url, "")
+		if err != nil {
+			return err
+		}
+
+		accToken, err = c.tokenProvider.GetToken(ctx, c.url)
+		if err != nil {
+			return status.Error(codes.Unauthenticated, "unable to get access token after refresh")
+		}
+		retryCtx := metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+accToken)
+		return invoker(retryCtx, method, req, reply, cc, opts...)
+	}
 }

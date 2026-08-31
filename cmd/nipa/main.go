@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/nipalab/nipa/internal/client/cli"
 	"github.com/nipalab/nipa/internal/client/usecase"
 )
@@ -53,9 +56,16 @@ func main() {
 	slog.Info("login successful", "access_token", res.AccessToken, "refresh_token", res.RefreshToken, "expires_in", res.ExpiresIn)*/
 
 	registry := &Registry{
-		authUsecase: usecase.NewAuth(nil, nil),
+		authUsecase: usecase.NewAuth(nil, nil, nil),
 	}
 
 	cliClient := cli.NewCli(registry)
-	cliClient.Run()
+	if err := cliClient.Run(); err != nil {
+		handleError(err)
+	}
+}
+
+func handleError(err error) {
+	fmt.Fprintln(os.Stderr, err)
+	os.Exit(1)
 }

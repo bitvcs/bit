@@ -34,13 +34,15 @@ message TreeManifest {
 
 message GetTreeManifestRequest {
     ProjectContext context = 1;
-    string path = 2;
-    optional string tree_hash = 3;
-    bool recursive = 4;
+    string branch = 2;
+    string path = 3;
+    optional string tree_hash = 4;
+    bool recursive = 5;
 }
 
 message GetTreeManifestResponse {
-    TreeManifest root_tree = 1;
+    string branch = 1;
+    TreeManifest root_tree = 2;
 }
 
 message Branch {
