@@ -50,7 +50,7 @@ func TestAPIRoutes(t *testing.T) {
 
 	node, _ := snow.NewNode(1)
 	reg := &testRegistry{
-		auth: usecase.NewAuth("test-secret", sqlite.NewUserRepository(dbConn), sqlite.NewAuthRepository(dbConn)),
+		auth: usecase.NewAuth("test-secret", nil, sqlite.NewUserRepository(dbConn), sqlite.NewAuthRepository(dbConn)),
 		user: usecase.NewUser(node),
 	}
 

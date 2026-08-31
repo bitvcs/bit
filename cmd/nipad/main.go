@@ -16,6 +16,7 @@ import (
 	"github.com/nipalab/nipa/internal/config"
 	"github.com/nipalab/nipa/internal/grpc/pb"
 	"github.com/nipalab/nipa/internal/grpc/server"
+	"github.com/nipalab/nipa/internal/hasher"
 	"github.com/nipalab/nipa/internal/http/api"
 	"github.com/nipalab/nipa/internal/repository/sqlite"
 	"github.com/nipalab/nipa/internal/snow"
@@ -45,12 +46,14 @@ func main() {
 	authRepo := sqlite.NewAuthRepository(dbConn)
 	userRepo := sqlite.NewUserRepository(dbConn)
 
+	passwordHasher := hasher.NewHasher(cfg.HasherWorkers)
+
 	snowUser, err := snow.NewNode(cfg.SnowflakeNodeID)
 	if err != nil {
 		panic(err)
 	}
 	reg := &Registry{
-		authUsecase: usecase.NewAuth(cfg.JWTKey, userRepo, authRepo),
+		authUsecase: usecase.NewAuth(cfg.JWTKey, passwordHasher, userRepo, authRepo),
 		userUsecase: usecase.NewUser(snowUser),
 	}
 

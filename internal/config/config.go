@@ -13,6 +13,7 @@ type Config struct {
 	JWTKey          string `mapstructure:"JWT_KEY"`
 	LogLevel        string `mapstructure:"LOG_LEVEL"`
 	SnowflakeNodeID int64  `mapstructure:"SNOWFLAKE_NODE_ID"`
+	HasherWorkers   int    `mapstructure:"HASHER_WORKERS"`
 }
 
 func LoadConfig() (*Config, error) {

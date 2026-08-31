@@ -58,4 +58,4 @@ CREATE TABLE refresh_tokens (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (id, name, email, password, is_super_admin) VALUES (1, 'Super Admin', 'supernipa', 'supernipa', 1);
+INSERT INTO users (id, name, email, password, is_super_admin) VALUES (1, 'Super Admin', 'supernipa', '$2a$10$kBH8NXuoJIXiUuA7jPEXOe8cybytpUH6eR6M3EO71tZgSU2D9QncW', 1);

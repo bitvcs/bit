@@ -50,7 +50,7 @@ func (m *loginMockContainer) Branch() *usecase.Branch { return nil }
 
 func newLoginServer(t *testing.T, userRepo *stubUserRepo, authRepo *stubAuthRepo) *nipaServer {
 	t.Helper()
-	auth := usecase.NewAuth("test-secret", userRepo, authRepo)
+	auth := usecase.NewAuth("test-secret", nil, userRepo, authRepo)
 	return New(&loginMockContainer{auth: auth})
 }
 

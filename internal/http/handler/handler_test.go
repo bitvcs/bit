@@ -78,7 +78,7 @@ func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, snow.ID) {
 	authRepo := sqlite.NewAuthRepository(dbConn)
 	node, _ := snow.NewNode(1)
 	reg := &handlerRegistry{
-		auth: usecase.NewAuth("test-secret", sqlite.NewUserRepository(dbConn), authRepo),
+		auth: usecase.NewAuth("test-secret", nil, sqlite.NewUserRepository(dbConn), authRepo),
 		user: usecase.NewUser(node),
 	}
 	return NewHandler(reg), authRepo, snow.ID(userID)

@@ -34,7 +34,7 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 			return nil
 		})
 
-	got, err := NewAuth("secret", userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
+	got, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
 	require.NoError(t, err)
 
 	require.Equal(t, "Bearer", got.TokenType)
@@ -63,7 +63,7 @@ func TestAuth_LoginWithEmailPassword_UserNotFound(t *testing.T) {
 		GetByEmail(gomock.Any(), "user@example.com").
 		Return(nil, wantErr)
 
-	_, err := NewAuth("secret", userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
+	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
 	require.ErrorIs(t, err, wantErr)
 }
 
@@ -82,7 +82,7 @@ func TestAuth_LoginWithEmailPassword_SaveRefreshTokenError(t *testing.T) {
 		SaveRefreshToken(gomock.Any(), snow.ID(1), gomock.Any(), gomock.Any()).
 		Return(wantErr)
 
-	_, err := NewAuth("secret", userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
+	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
 	require.ErrorIs(t, err, wantErr)
 }
 
@@ -109,7 +109,7 @@ func TestAuth_LoginWithRefreshToken(t *testing.T) {
 			return nil
 		})
 
-	got, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "old-refresh-token")
+	got, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithRefreshToken(ctx, "old-refresh-token")
 	require.NoError(t, err)
 
 	require.Equal(t, "Bearer", got.TokenType)
@@ -136,7 +136,7 @@ func TestAuth_LoginWithRefreshToken_Expired(t *testing.T) {
 		GetAndDeleteRefreshToken(gomock.Any(), "expired-token").
 		Return(&domain.RefreshToken{UserID: 7, ExpiresAt: time.Now().Add(-time.Hour)}, nil)
 
-	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "expired-token")
+	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithRefreshToken(ctx, "expired-token")
 	require.Error(t, err)
 
 	var domErr *domain.Error
@@ -157,7 +157,7 @@ func TestAuth_LoginWithRefreshToken_GetError(t *testing.T) {
 		GetAndDeleteRefreshToken(gomock.Any(), "unknown-token").
 		Return(nil, wantErr)
 
-	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "unknown-token")
+	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithRefreshToken(ctx, "unknown-token")
 	require.ErrorIs(t, err, wantErr)
 }
 
@@ -177,7 +177,7 @@ func TestAuth_LoginWithRefreshToken_UserNotFound(t *testing.T) {
 		GetByID(gomock.Any(), snow.ID(99)).
 		Return(nil, wantErr)
 
-	_, err := NewAuth("secret", userRepo, authRepo).LoginWithRefreshToken(ctx, "valid-token")
+	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithRefreshToken(ctx, "valid-token")
 	require.ErrorIs(t, err, wantErr)
 }
 
@@ -197,7 +197,7 @@ func TestAuth_ValidateToken_Valid(t *testing.T) {
 
 	token := signToken(t, jwt.SigningMethodHS256, []byte("secret"), want)
 
-	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	got, err := NewAuth("secret", nil, nil, nil).ValidateToken(ctx, token)
 	require.NoError(t, err)
 
 	require.Equal(t, "42", got.Subject)
@@ -221,7 +221,7 @@ func TestAuth_ValidateToken_Expired(t *testing.T) {
 
 	token := signToken(t, jwt.SigningMethodHS256, []byte("secret"), claims)
 
-	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	got, err := NewAuth("secret", nil, nil, nil).ValidateToken(ctx, token)
 	assertInvalidTokenError(t, err)
 	require.Nil(t, got)
 }
@@ -239,7 +239,7 @@ func TestAuth_ValidateToken_WrongSecret(t *testing.T) {
 
 	token := signToken(t, jwt.SigningMethodHS256, []byte("other-secret"), claims)
 
-	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	got, err := NewAuth("secret", nil, nil, nil).ValidateToken(ctx, token)
 	assertInvalidTokenError(t, err)
 	require.Nil(t, got)
 }
@@ -247,7 +247,7 @@ func TestAuth_ValidateToken_WrongSecret(t *testing.T) {
 func TestAuth_ValidateToken_Malformed(t *testing.T) {
 	ctx := context.Background()
 
-	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, "not-a-jwt")
+	got, err := NewAuth("secret", nil, nil, nil).ValidateToken(ctx, "not-a-jwt")
 	assertInvalidTokenError(t, err)
 	require.Nil(t, got)
 }
@@ -267,7 +267,7 @@ func TestAuth_ValidateToken_UnexpectedSigningMethod(t *testing.T) {
 		SignedString(jwt.UnsafeAllowNoneSignatureType)
 	require.NoError(t, err)
 
-	got, err := NewAuth("secret", nil, nil).ValidateToken(ctx, token)
+	got, err := NewAuth("secret", nil, nil, nil).ValidateToken(ctx, token)
 	assertInvalidTokenError(t, err)
 	require.Nil(t, got)
 }
@@ -294,28 +294,28 @@ func signToken(t *testing.T, method jwt.SigningMethod, key interface{}, claims d
 
 func TestAuth_HasProjectAccess_NoClaim(t *testing.T) {
 	ctx := context.Background()
-	auth := NewAuth("secret", nil, nil)
+	auth := NewAuth("secret", nil, nil, nil)
 	require.False(t, auth.HasProjectAccess(ctx, 1, domain.PermissionRead))
 }
 
 func TestAuth_HasProjectAccess_SuperAdmin(t *testing.T) {
 	claims := domain.Claims{IsSuperAdmin: true}
 	ctx := domain.ContextWithClaim(context.Background(), claims)
-	auth := NewAuth("secret", nil, nil)
+	auth := NewAuth("secret", nil, nil, nil)
 	require.True(t, auth.HasProjectAccess(ctx, 1, domain.PermissionRead))
 }
 
 func TestAuth_HasProjectAccess_Admin(t *testing.T) {
 	claims := domain.Claims{IsAdmin: true}
 	ctx := domain.ContextWithClaim(context.Background(), claims)
-	auth := NewAuth("secret", nil, nil)
+	auth := NewAuth("secret", nil, nil, nil)
 	require.True(t, auth.HasProjectAccess(ctx, 1, domain.PermissionWrite))
 }
 
 func TestAuth_HasProjectAccess_RegularUser(t *testing.T) {
 	claims := domain.Claims{UserID: 42}
 	ctx := domain.ContextWithClaim(context.Background(), claims)
-	auth := NewAuth("secret", nil, nil)
+	auth := NewAuth("secret", nil, nil, nil)
 	require.False(t, auth.HasProjectAccess(ctx, 1, domain.PermissionRead))
 }
 
