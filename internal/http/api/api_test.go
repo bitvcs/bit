@@ -28,6 +28,11 @@ type testRegistry struct {
 func (r *testRegistry) Auth() *usecase.Auth { return r.auth }
 func (r *testRegistry) User() *usecase.User { return r.user }
 
+type stubPasswordHasher struct{}
+
+func (stubPasswordHasher) Hash(_ string) (string, error) { return "hash", nil }
+func (stubPasswordHasher) Compare(_, _ string) bool      { return true }
+
 // TestAPIRoutes exercises the fully wired HTTP API. It must call SetupRoute
 // exactly once per process: SetupSwagger registers on the default mux, which
 // panics on duplicate registration.
@@ -50,7 +55,7 @@ func TestAPIRoutes(t *testing.T) {
 
 	node, _ := snow.NewNode(1)
 	reg := &testRegistry{
-		auth: usecase.NewAuth("test-secret", nil, sqlite.NewUserRepository(dbConn), sqlite.NewAuthRepository(dbConn)),
+		auth: usecase.NewAuth("test-secret", stubPasswordHasher{}, sqlite.NewUserRepository(dbConn), sqlite.NewAuthRepository(dbConn)),
 		user: usecase.NewUser(node),
 	}
 

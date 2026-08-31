@@ -57,6 +57,11 @@ type handlerRegistry struct {
 func (r *handlerRegistry) Auth() *usecase.Auth { return r.auth }
 func (r *handlerRegistry) User() *usecase.User { return r.user }
 
+type stubPasswordHasher struct{}
+
+func (stubPasswordHasher) Hash(_ string) (string, error) { return "hash", nil }
+func (stubPasswordHasher) Compare(_, _ string) bool      { return true }
+
 func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, snow.ID) {
 	t.Helper()
 
@@ -78,7 +83,7 @@ func newHandlerTestSetup(t *testing.T) (*Handler, *sqlite.Auth, snow.ID) {
 	authRepo := sqlite.NewAuthRepository(dbConn)
 	node, _ := snow.NewNode(1)
 	reg := &handlerRegistry{
-		auth: usecase.NewAuth("test-secret", nil, sqlite.NewUserRepository(dbConn), authRepo),
+		auth: usecase.NewAuth("test-secret", stubPasswordHasher{}, sqlite.NewUserRepository(dbConn), authRepo),
 		user: usecase.NewUser(node),
 	}
 	return NewHandler(reg), authRepo, snow.ID(userID)

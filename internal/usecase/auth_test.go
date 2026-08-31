@@ -15,6 +15,17 @@ import (
 	"github.com/nipalab/nipa/internal/snow"
 )
 
+type stubPasswordHasher struct {
+	match bool
+}
+
+func (s stubPasswordHasher) Hash(_ string) (string, error) { return "hash", nil }
+func (s stubPasswordHasher) Compare(_, _ string) bool     { return s.match }
+
+func newTestAuth(secret string, match bool, userRepo userRepository, authRepo authRepository) *Auth {
+	return NewAuth(secret, stubPasswordHasher{match: match}, userRepo, authRepo)
+}
+
 func TestAuth_LoginWithEmailPassword(t *testing.T) {
 	ctx := context.Background()
 	user := &domain.User{ID: snow.ID(42), Email: "user@example.com", IsAdmin: true}
@@ -34,7 +45,7 @@ func TestAuth_LoginWithEmailPassword(t *testing.T) {
 			return nil
 		})
 
-	got, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
+	got, err := newTestAuth("secret", true, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
 	require.NoError(t, err)
 
 	require.Equal(t, "Bearer", got.TokenType)
@@ -82,7 +93,7 @@ func TestAuth_LoginWithEmailPassword_SaveRefreshTokenError(t *testing.T) {
 		SaveRefreshToken(gomock.Any(), snow.ID(1), gomock.Any(), gomock.Any()).
 		Return(wantErr)
 
-	_, err := NewAuth("secret", nil, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
+	_, err := newTestAuth("secret", true, userRepo, authRepo).LoginWithEmailPassword(ctx, "user@example.com", "password")
 	require.ErrorIs(t, err, wantErr)
 }
 
