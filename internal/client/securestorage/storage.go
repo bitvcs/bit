@@ -18,7 +18,7 @@ func New() *Storage {
 
 func (s *Storage) SaveToken(data *domain.LoginResult) error {
 	token := AccessToken{
-		Domain:       data.Domain,
+		Host:         data.Host,
 		AccessToken:  data.AccessToken,
 		RefreshToken: data.RefreshToken,
 		ExpiresIn:    data.ExpiresIn,
@@ -28,7 +28,7 @@ func (s *Storage) SaveToken(data *domain.LoginResult) error {
 		return err
 	}
 
-	err = keyring.Set(serviceName, data.Domain, string(jsonData))
+	err = keyring.Set(serviceName, data.Host, string(jsonData))
 	if err != nil {
 		return err
 	}
@@ -36,8 +36,8 @@ func (s *Storage) SaveToken(data *domain.LoginResult) error {
 	return nil
 }
 
-func (s *Storage) LoadToken(serverDomain string) (*domain.LoginResult, error) {
-	data, err := keyring.Get(serviceName, serverDomain)
+func (s *Storage) LoadToken(host string) (*domain.LoginResult, error) {
+	data, err := keyring.Get(serviceName, host)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (s *Storage) LoadToken(serverDomain string) (*domain.LoginResult, error) {
 	}
 
 	return &domain.LoginResult{
-		Domain:       token.Domain,
+		Host:         token.Host,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		ExpiresIn:    token.ExpiresIn,

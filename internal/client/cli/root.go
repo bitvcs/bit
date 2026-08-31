@@ -7,6 +7,7 @@ import (
 
 type usecaseContainer interface {
 	Auth() *usecase.Auth
+	Repo() *usecase.Repo
 }
 
 type Cli struct {

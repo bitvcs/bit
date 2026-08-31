@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"log/slog"
+	"context"
 
 	"github.com/nipalab/nipa/internal/client/domain"
 	"github.com/spf13/cobra"
@@ -22,8 +22,7 @@ func (c *Cli) setupCloneCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			slog.Info("Cloning repository", "url", url, "branch", branch, "org", nipaUrl.Org, "project", nipaUrl.Project)
-			return nil
+			return c.useCase.Repo().Clone(context.Background(), nipaUrl.Host, nipaUrl.Org, nipaUrl.Project, branch, nipaUrl.Path)
 		},
 	}
 	cmd.Flags().StringP("branch", "b", "main", "Specify the branch to clone")

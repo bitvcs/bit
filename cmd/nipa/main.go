@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/nipalab/nipa/internal/client/cli"
+	"github.com/nipalab/nipa/internal/client/securestorage"
 	"github.com/nipalab/nipa/internal/client/usecase"
 )
 
@@ -55,8 +56,14 @@ func main() {
 
 	slog.Info("login successful", "access_token", res.AccessToken, "refresh_token", res.RefreshToken, "expires_in", res.ExpiresIn)*/
 
+	secureStorage := securestorage.New()
+	prompter := cli.NewPrompter()
+
+	authUsecase := usecase.NewAuth(nil, secureStorage, prompter)
+	repoUsecase := usecase.NewRepo(authUsecase)
 	registry := &Registry{
-		authUsecase: usecase.NewAuth(nil, nil, nil),
+		authUsecase: authUsecase,
+		repoUsecase: repoUsecase,
 	}
 
 	cliClient := cli.NewCli(registry)
