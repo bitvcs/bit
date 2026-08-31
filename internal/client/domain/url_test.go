@@ -21,6 +21,7 @@ func TestParseNipaUrl_Valid(t *testing.T) {
 				Host:    "example.com:9000",
 				Org:     "org",
 				Project: "project",
+				Path:    "",
 			},
 		},
 		{
@@ -31,26 +32,29 @@ func TestParseNipaUrl_Valid(t *testing.T) {
 				Host:    "example.com",
 				Org:     "org",
 				Project: "project",
+				Path:    "",
 			},
 		},
 		{
-			name:      "path with only project defaults org",
-			urlString: "https://example.com/project",
+			name:      "https with repo path",
+			urlString: "https://example.com/org/project/path/to/repo",
 			want: &NipaUrl{
-				Url:     "https://example.com/project",
+				Url:     "https://example.com/org/project/path/to/repo",
 				Host:    "example.com",
-				Org:     "default",
+				Org:     "org",
 				Project: "project",
+				Path:    "path/to/repo",
 			},
 		},
 		{
-			name:      "path with no segments defaults org and empty project",
-			urlString: "https://example.com",
+			name:      "https with single path segment",
+			urlString: "https://example.com/org/project/subdir",
 			want: &NipaUrl{
-				Url:     "https://example.com",
+				Url:     "https://example.com/org/project/subdir",
 				Host:    "example.com",
-				Org:     "default",
-				Project: "",
+				Org:     "org",
+				Project: "project",
+				Path:    "subdir",
 			},
 		},
 	}
@@ -81,7 +85,11 @@ func TestParseNipaUrl_InvalidURL(t *testing.T) {
 }
 
 func TestParseNipaUrl_InvalidPath(t *testing.T) {
-	_, err := ParseNipaUrl("https://example.com/org/project/extra")
+	_, err := ParseNipaUrl("https://example.com/org")
 	require.Error(t, err)
-	require.EqualError(t, err, "invalid URL path, expected /org/project")
+	require.EqualError(t, err, "invalid URL path, expected /org/project/[path]")
+
+	_, err = ParseNipaUrl("https://example.com")
+	require.Error(t, err)
+	require.EqualError(t, err, "invalid URL path, expected /org/project/[path]")
 }

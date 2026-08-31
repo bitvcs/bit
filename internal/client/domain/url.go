@@ -11,6 +11,7 @@ type NipaUrl struct {
 	Host    string
 	Org     string
 	Project string
+	Path    string
 }
 
 func ParseNipaUrl(urlString string) (*NipaUrl, error) {
@@ -29,16 +30,15 @@ func ParseNipaUrl(urlString string) (*NipaUrl, error) {
 	}
 
 	pathSegments := strings.Split(strings.TrimPrefix(parsedURL.Path, "/"), "/")
-	if len(pathSegments) < 1 || len(pathSegments) > 2 {
-		return nil, NewUserError("invalid URL path, expected /org/project")
+	if len(pathSegments) < 2 {
+		return nil, NewUserError("invalid URL path, expected /org/project/[path]")
 	}
 
 	org := pathSegments[0]
-	project := pathSegments[0]
-	if len(pathSegments) == 1 {
-		org = "default"
-	} else {
-		project = pathSegments[1]
+	project := pathSegments[1]
+	repoPath := ""
+	if len(pathSegments) > 2 {
+		repoPath = strings.Join(pathSegments[2:], "/")
 	}
 
 	nipaUrl := &NipaUrl{
@@ -46,6 +46,7 @@ func ParseNipaUrl(urlString string) (*NipaUrl, error) {
 		Host:    parsedURL.Host,
 		Org:     org,
 		Project: project,
+		Path:    repoPath,
 	}
 	return nipaUrl, nil
 }
