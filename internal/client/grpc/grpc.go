@@ -4,6 +4,8 @@ import (
 	"context"
 	"log/slog"
 
+	"github.com/nipalab/nipa/internal/client/domain"
+	pb "github.com/nipalab/nipa/internal/grpc/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
@@ -89,4 +91,43 @@ func (c *Client) unaryAuthInterceptor() grpc.UnaryClientInterceptor {
 		retryCtx := metadata.AppendToOutgoingContext(ctx, "authorization", "Bearer "+accToken)
 		return invoker(retryCtx, method, req, reply, cc, opts...)
 	}
+}
+
+func (c *Client) LoginWithUsernamePassword(ctx context.Context, host, username, password string) (*domain.LoginResult, error) {
+	if err := c.Connect(host); err != nil {
+		return nil, err
+	}
+	client := pb.NewNipaServiceClient(c.clientConn)
+	res, err := client.LoginWithUsernamePassword(ctx, &pb.LoginUsernamePasswordRequest{
+		Username: username,
+		Password: password,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &domain.LoginResult{
+		AccessToken:  res.GetAccessToken(),
+		RefreshToken: res.GetRefreshToken(),
+		ExpiresIn:    int(res.GetExpiresIn()),
+		Host:         host,
+	}, nil
+}
+
+func (c *Client) LoginWithRefreshToken(ctx context.Context, host, refreshToken string) (*domain.LoginResult, error) {
+	if err := c.Connect(host); err != nil {
+		return nil, err
+	}
+	client := pb.NewNipaServiceClient(c.clientConn)
+	res, err := client.LoginWithRefreshToken(ctx, &pb.LoginWithRefreshRequest{
+		RefreshToken: refreshToken,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &domain.LoginResult{
+		AccessToken:  res.GetAccessToken(),
+		RefreshToken: res.GetRefreshToken(),
+		ExpiresIn:    int(res.GetExpiresIn()),
+		Host:         host,
+	}, nil
 }

@@ -36,6 +36,10 @@ func NewAuth(executor loginExecutor, storage secureStorage, input userInput) *Au
 	}
 }
 
+func (a *Auth) SetLoginExecutor(executor loginExecutor) {
+	a.loginExecutor = executor
+}
+
 func (l *Auth) LoginWithUsernamePassword(ctx context.Context, host, username, password string) error {
 	if username == "" {
 		return domain.NewUserError("username cannot be empty")
