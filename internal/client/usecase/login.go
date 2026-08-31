@@ -2,10 +2,11 @@ package usecase
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
+	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/nipalab/nipa/internal/client/domain"
-	serverDomain "github.com/nipalab/nipa/internal/domain"
 )
 
 type userInput interface {
@@ -81,11 +82,24 @@ func (l *Auth) isLoggedIn(host string) (bool, error) {
 	if err != nil {
 		return false, nil
 	}
-	claims := serverDomain.Claims{}
-	_, _, err = jwt.NewParser().ParseUnverified(token.AccessToken, &claims)
-	if err != nil {
-		return false, domain.NewTokenError(err.Error())
+
+	parts := strings.Split(token.AccessToken, ".")
+	if len(parts) != 3 {
+		return false, domain.NewTokenError("invalid token format")
 	}
+
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return false, domain.NewTokenError("invalid token payload")
+	}
+
+	var claims struct {
+		Exp int64 `json:"exp"`
+	}
+	if err := json.Unmarshal(payload, &claims); err != nil {
+		return false, domain.NewTokenError("invalid token claims")
+	}
+
 	return true, nil
 }
 
