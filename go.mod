@@ -3,6 +3,7 @@ module github.com/nipalab/nipa
 go 1.27.0
 
 require (
+	github.com/creack/pty v1.1.24
 	github.com/emicklei/go-restful-openapi/v2 v2.12.1
 	github.com/emicklei/go-restful/v3 v3.13.0
 	github.com/go-openapi/spec v0.22.2
