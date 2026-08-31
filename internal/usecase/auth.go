@@ -27,17 +27,24 @@ type authRepository interface {
 	GetAndDeleteRefreshToken(ctx context.Context, refreshToken string) (*domain.RefreshToken, error)
 }
 
-type Auth struct {
-	secret   string
-	userRepo userRepository
-	authRepo authRepository
+type passwordHasher interface {
+	Hash(password string) (string, error)
+	Compare(hash, password string) bool
 }
 
-func NewAuth(secret string, userRepo userRepository, authRepo authRepository) *Auth {
+type Auth struct {
+	secret         string
+	passwordHasher passwordHasher
+	userRepo       userRepository
+	authRepo       authRepository
+}
+
+func NewAuth(secret string, passwordHasher passwordHasher, userRepo userRepository, authRepo authRepository) *Auth {
 	return &Auth{
-		secret:   secret,
-		userRepo: userRepo,
-		authRepo: authRepo,
+		secret:         secret,
+		passwordHasher: passwordHasher,
+		userRepo:       userRepo,
+		authRepo:       authRepo,
 	}
 }
 
@@ -48,6 +55,9 @@ func (a *Auth) LoginWithEmailPassword(ctx context.Context, email string, passwor
 			return nil, domain.NewErrorUser("invalid email or password")
 		}
 		return nil, err
+	}
+	if !a.passwordHasher.Compare(user.Password, password) {
+		return nil, domain.NewErrorUser("invalid email or password")
 	}
 	return a.generateLoginResult(ctx, user)
 }

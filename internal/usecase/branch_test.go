@@ -185,3 +185,62 @@ func TestBranch_GetByProjectIDAndID_NotFound(t *testing.T) {
 	require.ErrorAs(t, err, &domErr)
 	require.Equal(t, 404, domErr.Code)
 }
+
+func TestBranch_GetDefault_NoPermission(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	perm := NewMockpermissionUsecase(ctrl)
+	repo := NewMockbranchRepository(ctrl)
+
+	perm.EXPECT().
+		HasProjectAccess(gomock.Any(), snow.ID(1), domain.PermissionRead).
+		Return(false)
+
+	uc := NewBranch(perm, repo)
+	_, err := uc.GetDefault(context.Background(), snow.ID(1))
+	require.Error(t, err)
+
+	var domErr *domain.Error
+	require.ErrorAs(t, err, &domErr)
+	require.Equal(t, 403, domErr.Code)
+}
+
+func TestBranch_GetDefault_Success(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	perm := NewMockpermissionUsecase(ctrl)
+	repo := NewMockbranchRepository(ctrl)
+
+	want := &domain.Branch{ID: 1, ProjectID: 1, Name: "main", IsDefault: true}
+
+	perm.EXPECT().
+		HasProjectAccess(gomock.Any(), snow.ID(1), domain.PermissionRead).
+		Return(true)
+
+	repo.EXPECT().
+		GetDefaultBranch(gomock.Any(), snow.ID(1)).
+		Return(want, nil)
+
+	uc := NewBranch(perm, repo)
+	got, err := uc.GetDefault(context.Background(), snow.ID(1))
+	require.NoError(t, err)
+	require.Equal(t, want, got)
+}
+
+func TestBranch_GetDefault_RepositoryError(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	perm := NewMockpermissionUsecase(ctrl)
+	repo := NewMockbranchRepository(ctrl)
+
+	wantErr := errors.New("db down")
+
+	perm.EXPECT().
+		HasProjectAccess(gomock.Any(), snow.ID(1), domain.PermissionRead).
+		Return(true)
+
+	repo.EXPECT().
+		GetDefaultBranch(gomock.Any(), snow.ID(1)).
+		Return(nil, wantErr)
+
+	uc := NewBranch(perm, repo)
+	_, err := uc.GetDefault(context.Background(), snow.ID(1))
+	require.ErrorIs(t, err, wantErr)
+}

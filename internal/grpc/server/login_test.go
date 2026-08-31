@@ -40,6 +40,11 @@ func (s *stubAuthRepo) GetAndDeleteRefreshToken(_ context.Context, _ string) (*d
 	return s.refreshToken, s.refreshErr
 }
 
+type stubPasswordHasher struct{}
+
+func (stubPasswordHasher) Hash(_ string) (string, error) { return "hash", nil }
+func (stubPasswordHasher) Compare(_, _ string) bool      { return true }
+
 type loginMockContainer struct {
 	auth *usecase.Auth
 }
@@ -50,7 +55,7 @@ func (m *loginMockContainer) Branch() *usecase.Branch { return nil }
 
 func newLoginServer(t *testing.T, userRepo *stubUserRepo, authRepo *stubAuthRepo) *nipaServer {
 	t.Helper()
-	auth := usecase.NewAuth("test-secret", userRepo, authRepo)
+	auth := usecase.NewAuth("test-secret", stubPasswordHasher{}, userRepo, authRepo)
 	return New(&loginMockContainer{auth: auth})
 }
 

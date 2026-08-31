@@ -20,3 +20,6 @@ CREATE TABLE projects (
     deleted_at DATETIME,
     UNIQUE(org_id, slug)
 );
+
+INSERT INTO organizations (id, slug, name) VALUES (1, 'default', 'Default Organization');
+INSERT INTO projects (id, org_id, slug, name) VALUES (1, 1, 'default', 'Default Project');

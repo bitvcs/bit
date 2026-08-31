@@ -59,13 +59,13 @@ func TestGetListBranch_Success(t *testing.T) {
 		ListBranches(gomock.Any(), projectID, 10, gomock.Any(), snow.ID(0)).
 		Return([]*domain.Branch{
 			{
-				ID:        branchID,
-				ProjectID: projectID,
-				Name:      "main",
-				Protected: true,
-				CommitID:  &commitID,
-				UpdatedAt: now,
-				CreatedAt: now,
+				ID:          branchID,
+				ProjectID:   projectID,
+				Name:        "main",
+				IsProtected: true,
+				CommitID:    &commitID,
+				UpdatedAt:   now,
+				CreatedAt:   now,
 			},
 		}, nil)
 
@@ -79,7 +79,7 @@ func TestGetListBranch_Success(t *testing.T) {
 	b := resp.Branches[0]
 	require.Equal(t, branchID.Base36(), b.Id)
 	require.Equal(t, "main", b.Name)
-	require.True(t, b.Protected)
+	require.True(t, b.IsProtected)
 	require.Equal(t, commitID.Base36(), b.CommitId)
 	require.Equal(t, now.Unix(), b.CreatedAt.AsTime().Unix())
 	require.Equal(t, now.Unix(), b.UpdatedAt.AsTime().Unix())
@@ -192,13 +192,13 @@ func TestGetBranch_Success(t *testing.T) {
 	repo.EXPECT().
 		GetByProjectIDAndID(gomock.Any(), projectID, branchID).
 		Return(&domain.Branch{
-			ID:        branchID,
-			ProjectID: projectID,
-			Name:      "develop",
-			Protected: false,
-			CommitID:  &commitID,
-			UpdatedAt: now,
-			CreatedAt: now,
+			ID:          branchID,
+			ProjectID:   projectID,
+			Name:        "develop",
+			IsProtected: false,
+			CommitID:    &commitID,
+			UpdatedAt:   now,
+			CreatedAt:   now,
 		}, nil)
 
 	resp, err := srv.GetBranch(context.Background(), &pb.GetBranchRequest{
@@ -209,7 +209,7 @@ func TestGetBranch_Success(t *testing.T) {
 	require.NotNil(t, resp.Branch)
 	require.Equal(t, branchID.Base36(), resp.Branch.Id)
 	require.Equal(t, "develop", resp.Branch.Name)
-	require.False(t, resp.Branch.Protected)
+	require.False(t, resp.Branch.IsProtected)
 	require.Equal(t, commitID.Base36(), resp.Branch.CommitId)
 }
 

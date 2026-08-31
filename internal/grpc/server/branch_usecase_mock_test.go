@@ -96,6 +96,21 @@ func (mr *MockbranchRepositoryMockRecorder) GetByProjectIDAndID(ctx, projectID, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByProjectIDAndID", reflect.TypeOf((*MockbranchRepository)(nil).GetByProjectIDAndID), ctx, projectID, branchID)
 }
 
+// GetDefaultBranch mocks base method.
+func (m *MockbranchRepository) GetDefaultBranch(ctx context.Context, projectID snow.ID) (*domain.Branch, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDefaultBranch", ctx, projectID)
+	ret0, _ := ret[0].(*domain.Branch)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDefaultBranch indicates an expected call of GetDefaultBranch.
+func (mr *MockbranchRepositoryMockRecorder) GetDefaultBranch(ctx, projectID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDefaultBranch", reflect.TypeOf((*MockbranchRepository)(nil).GetDefaultBranch), ctx, projectID)
+}
+
 // ListBranches mocks base method.
 func (m *MockbranchRepository) ListBranches(ctx context.Context, projectID snow.ID, limit int, updatedAfter *time.Time, lastID snow.ID) ([]*domain.Branch, error) {
 	m.ctrl.T.Helper()

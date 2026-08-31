@@ -273,9 +273,10 @@ func (x *TreeManifest) GetFiles() []*FileNode {
 type GetTreeManifestRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Context       *ProjectContext        `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
-	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	TreeHash      *string                `protobuf:"bytes,3,opt,name=tree_hash,json=treeHash,proto3,oneof" json:"tree_hash,omitempty"`
-	Recursive     bool                   `protobuf:"varint,4,opt,name=recursive,proto3" json:"recursive,omitempty"`
+	Branch        string                 `protobuf:"bytes,2,opt,name=branch,proto3" json:"branch,omitempty"`
+	Path          string                 `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	TreeHash      *string                `protobuf:"bytes,4,opt,name=tree_hash,json=treeHash,proto3,oneof" json:"tree_hash,omitempty"`
+	Recursive     bool                   `protobuf:"varint,5,opt,name=recursive,proto3" json:"recursive,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -317,6 +318,13 @@ func (x *GetTreeManifestRequest) GetContext() *ProjectContext {
 	return nil
 }
 
+func (x *GetTreeManifestRequest) GetBranch() string {
+	if x != nil {
+		return x.Branch
+	}
+	return ""
+}
+
 func (x *GetTreeManifestRequest) GetPath() string {
 	if x != nil {
 		return x.Path
@@ -340,7 +348,8 @@ func (x *GetTreeManifestRequest) GetRecursive() bool {
 
 type GetTreeManifestResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RootTree      *TreeManifest          `protobuf:"bytes,1,opt,name=root_tree,json=rootTree,proto3" json:"root_tree,omitempty"`
+	Branch        string                 `protobuf:"bytes,1,opt,name=branch,proto3" json:"branch,omitempty"`
+	RootTree      *TreeManifest          `protobuf:"bytes,2,opt,name=root_tree,json=rootTree,proto3" json:"root_tree,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -375,6 +384,13 @@ func (*GetTreeManifestResponse) Descriptor() ([]byte, []int) {
 	return file_internal_grpc_proto_server_proto_rawDescGZIP(), []int{4}
 }
 
+func (x *GetTreeManifestResponse) GetBranch() string {
+	if x != nil {
+		return x.Branch
+	}
+	return ""
+}
+
 func (x *GetTreeManifestResponse) GetRootTree() *TreeManifest {
 	if x != nil {
 		return x.RootTree
@@ -389,7 +405,8 @@ type Branch struct {
 	Id            string                 `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
 	CommitId      string                 `protobuf:"bytes,5,opt,name=commit_id,json=commitId,proto3" json:"commit_id,omitempty"`
-	Protected     bool                   `protobuf:"varint,6,opt,name=protected,proto3" json:"protected,omitempty"`
+	IsProtected   bool                   `protobuf:"varint,6,opt,name=is_protected,json=isProtected,proto3" json:"is_protected,omitempty"`
+	IsDefault     bool                   `protobuf:"varint,7,opt,name=is_default,json=isDefault,proto3" json:"is_default,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -459,9 +476,16 @@ func (x *Branch) GetCommitId() string {
 	return ""
 }
 
-func (x *Branch) GetProtected() bool {
+func (x *Branch) GetIsProtected() bool {
 	if x != nil {
-		return x.Protected
+		return x.IsProtected
+	}
+	return false
+}
+
+func (x *Branch) GetIsDefault() bool {
+	if x != nil {
+		return x.IsDefault
 	}
 	return false
 }
@@ -850,16 +874,18 @@ const file_internal_grpc_proto_server_proto_rawDesc = "" +
 	"\ttree_hash\x18\x01 \x01(\tR\btreeHash\x12\x12\n" +
 	"\x04path\x18\x02 \x01(\tR\x04path\x120\n" +
 	"\tsub_trees\x18\x03 \x03(\v2\x13.greet.TreeManifestR\bsubTrees\x12%\n" +
-	"\x05files\x18\x04 \x03(\v2\x0f.greet.FileNodeR\x05files\"\xab\x01\n" +
+	"\x05files\x18\x04 \x03(\v2\x0f.greet.FileNodeR\x05files\"\xc3\x01\n" +
 	"\x16GetTreeManifestRequest\x12/\n" +
-	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x12\n" +
-	"\x04path\x18\x02 \x01(\tR\x04path\x12 \n" +
-	"\ttree_hash\x18\x03 \x01(\tH\x00R\btreeHash\x88\x01\x01\x12\x1c\n" +
-	"\trecursive\x18\x04 \x01(\bR\trecursiveB\f\n" +
+	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x16\n" +
+	"\x06branch\x18\x02 \x01(\tR\x06branch\x12\x12\n" +
+	"\x04path\x18\x03 \x01(\tR\x04path\x12 \n" +
+	"\ttree_hash\x18\x04 \x01(\tH\x00R\btreeHash\x88\x01\x01\x12\x1c\n" +
+	"\trecursive\x18\x05 \x01(\bR\trecursiveB\f\n" +
 	"\n" +
-	"_tree_hash\"K\n" +
-	"\x17GetTreeManifestResponse\x120\n" +
-	"\troot_tree\x18\x01 \x01(\v2\x13.greet.TreeManifestR\brootTree\"\xdd\x01\n" +
+	"_tree_hash\"c\n" +
+	"\x17GetTreeManifestResponse\x12\x16\n" +
+	"\x06branch\x18\x01 \x01(\tR\x06branch\x120\n" +
+	"\troot_tree\x18\x02 \x01(\v2\x13.greet.TreeManifestR\brootTree\"\x81\x02\n" +
 	"\x06Branch\x129\n" +
 	"\n" +
 	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
@@ -867,8 +893,10 @@ const file_internal_grpc_proto_server_proto_rawDesc = "" +
 	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x12\x1b\n" +
-	"\tcommit_id\x18\x05 \x01(\tR\bcommitId\x12\x1c\n" +
-	"\tprotected\x18\x06 \x01(\bR\tprotected\"\xe4\x01\n" +
+	"\tcommit_id\x18\x05 \x01(\tR\bcommitId\x12!\n" +
+	"\fis_protected\x18\x06 \x01(\bR\visProtected\x12\x1d\n" +
+	"\n" +
+	"is_default\x18\a \x01(\bR\tisDefault\"\xe4\x01\n" +
 	"\x14GetListBranchRequest\x12/\n" +
 	"\acontext\x18\x01 \x01(\v2\x15.greet.ProjectContextR\acontext\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12G\n" +

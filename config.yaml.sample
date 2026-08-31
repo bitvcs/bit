@@ -4,3 +4,4 @@ DATABASE_DSN: sqlite://nipa.db
 JWT_KEY: secret
 LOG_LEVEL: debug
 SNOWFLAKE_NODE_ID: 0
+HASHER_WORKERS: 4

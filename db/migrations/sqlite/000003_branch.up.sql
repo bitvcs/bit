@@ -49,7 +49,8 @@ CREATE TABLE branches (
     project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
     name TEXT NOT NULL, 
     key TEXT NOT NULL,
-    protected BOOLEAN NOT NULL DEFAULT FALSE,
+    is_protected BOOLEAN NOT NULL DEFAULT FALSE,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
     commit_id INTEGER REFERENCES commits(id),
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,3 +61,9 @@ CREATE TABLE branches (
 
 CREATE INDEX idx_branches_project_updated_id 
     ON branches (project_id, updated_at DESC, id DESC);
+
+CREATE UNIQUE INDEX idx_branches_one_default_per_project 
+    ON branches (project_id) 
+    WHERE is_default = TRUE;
+
+INSERT INTO branches (id, project_id, name, key, is_default) VALUES (1, 1, 'main', 'main', TRUE);

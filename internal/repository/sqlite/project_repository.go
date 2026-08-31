@@ -47,6 +47,17 @@ func (r *ProjectRepository) Get(ctx context.Context, id snow.ID) (domain.Project
 	return toDomainProject(row), nil
 }
 
+func (r *ProjectRepository) GetByOrgIDAndSlug(ctx context.Context, orgID snow.ID, slug string) (domain.Project, error) {
+	row, err := r.queries.GetProjectByOrgIDAndSlug(ctx, sqlcSqlite.GetProjectByOrgIDAndSlugParams{
+		OrgID: orgID.Int64(),
+		Slug:  slug,
+	})
+	if err != nil {
+		return domain.Project{}, err
+	}
+	return toDomainProject(row), nil
+}
+
 func (r *ProjectRepository) ListByOrgID(ctx context.Context, orgID snow.ID) ([]domain.Project, error) {
 	rows, err := r.queries.ListProjectsByOrgId(ctx, orgID.Int64())
 	if err != nil {

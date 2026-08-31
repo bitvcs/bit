@@ -11,14 +11,16 @@ import (
 )
 
 const branchCreate = `-- name: BranchCreate :exec
-INSERT INTO branches (id, project_id, name, commit_id) VALUES (?, ?, ?, ?)
+INSERT INTO branches (id, project_id, name, commit_id, is_default, is_protected) VALUES (?, ?, ?, ?, ?, ?)
 `
 
 type BranchCreateParams struct {
-	ID        int64         `json:"id"`
-	ProjectID int64         `json:"project_id"`
-	Name      string        `json:"name"`
-	CommitID  sql.NullInt64 `json:"commit_id"`
+	ID          int64         `json:"id"`
+	ProjectID   int64         `json:"project_id"`
+	Name        string        `json:"name"`
+	CommitID    sql.NullInt64 `json:"commit_id"`
+	IsDefault   bool          `json:"is_default"`
+	IsProtected bool          `json:"is_protected"`
 }
 
 func (q *Queries) BranchCreate(ctx context.Context, arg BranchCreateParams) error {
@@ -27,12 +29,14 @@ func (q *Queries) BranchCreate(ctx context.Context, arg BranchCreateParams) erro
 		arg.ProjectID,
 		arg.Name,
 		arg.CommitID,
+		arg.IsDefault,
+		arg.IsProtected,
 	)
 	return err
 }
 
 const branchGet = `-- name: BranchGet :one
-SELECT id, project_id, name, "key", protected, commit_id, updated_at, created_at, deleted, deleted_at
+SELECT id, project_id, name, "key", is_protected, is_default, commit_id, updated_at, created_at, deleted, deleted_at
 FROM branches
 WHERE project_id = ?1 AND id = ?2
 LIMIT 1
@@ -51,7 +55,34 @@ func (q *Queries) BranchGet(ctx context.Context, arg BranchGetParams) (Branch, e
 		&i.ProjectID,
 		&i.Name,
 		&i.Key,
-		&i.Protected,
+		&i.IsProtected,
+		&i.IsDefault,
+		&i.CommitID,
+		&i.UpdatedAt,
+		&i.CreatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const branchGetDefault = `-- name: BranchGetDefault :one
+SELECT id, project_id, name, "key", is_protected, is_default, commit_id, updated_at, created_at, deleted, deleted_at
+FROM branches
+WHERE project_id = ?1 AND is_default = TRUE
+LIMIT 1
+`
+
+func (q *Queries) BranchGetDefault(ctx context.Context, projectID int64) (Branch, error) {
+	row := q.db.QueryRowContext(ctx, branchGetDefault, projectID)
+	var i Branch
+	err := row.Scan(
+		&i.ID,
+		&i.ProjectID,
+		&i.Name,
+		&i.Key,
+		&i.IsProtected,
+		&i.IsDefault,
 		&i.CommitID,
 		&i.UpdatedAt,
 		&i.CreatedAt,
@@ -62,7 +93,7 @@ func (q *Queries) BranchGet(ctx context.Context, arg BranchGetParams) (Branch, e
 }
 
 const branchList = `-- name: BranchList :many
-SELECT id, project_id, name, "key", protected, commit_id, updated_at, created_at, deleted, deleted_at
+SELECT id, project_id, name, "key", is_protected, is_default, commit_id, updated_at, created_at, deleted, deleted_at
 FROM branches
 WHERE project_id = ?1
   AND (?2 is null or updated_at < ?2 OR (updated_at = ?2 AND id < ?3))
@@ -96,7 +127,8 @@ func (q *Queries) BranchList(ctx context.Context, arg BranchListParams) ([]Branc
 			&i.ProjectID,
 			&i.Name,
 			&i.Key,
-			&i.Protected,
+			&i.IsProtected,
+			&i.IsDefault,
 			&i.CommitID,
 			&i.UpdatedAt,
 			&i.CreatedAt,
@@ -116,16 +148,26 @@ func (q *Queries) BranchList(ctx context.Context, arg BranchListParams) ([]Branc
 	return items, nil
 }
 
+const branchRemoveDefault = `-- name: BranchRemoveDefault :exec
+UPDATE branches SET is_default = FALSE WHERE project_id = ?1 AND is_default = TRUE
+`
+
+func (q *Queries) BranchRemoveDefault(ctx context.Context, projectID int64) error {
+	_, err := q.db.ExecContext(ctx, branchRemoveDefault, projectID)
+	return err
+}
+
 const branchUpdate = `-- name: BranchUpdate :exec
-UPDATE branches SET name = ?, key = ?, commit_id = ?, protected = ? WHERE id = ?
+UPDATE branches SET name = ?, key = ?, commit_id = ?, is_protected = ?, is_default = ? WHERE id = ?
 `
 
 type BranchUpdateParams struct {
-	Name      string        `json:"name"`
-	Key       string        `json:"key"`
-	CommitID  sql.NullInt64 `json:"commit_id"`
-	Protected bool          `json:"protected"`
-	ID        int64         `json:"id"`
+	Name        string        `json:"name"`
+	Key         string        `json:"key"`
+	CommitID    sql.NullInt64 `json:"commit_id"`
+	IsProtected bool          `json:"is_protected"`
+	IsDefault   bool          `json:"is_default"`
+	ID          int64         `json:"id"`
 }
 
 func (q *Queries) BranchUpdate(ctx context.Context, arg BranchUpdateParams) error {
@@ -133,7 +175,8 @@ func (q *Queries) BranchUpdate(ctx context.Context, arg BranchUpdateParams) erro
 		arg.Name,
 		arg.Key,
 		arg.CommitID,
-		arg.Protected,
+		arg.IsProtected,
+		arg.IsDefault,
 		arg.ID,
 	)
 	return err

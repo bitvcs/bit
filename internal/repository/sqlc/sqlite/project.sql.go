@@ -100,6 +100,32 @@ func (q *Queries) GetProjectByOrgIDAndID(ctx context.Context, arg GetProjectByOr
 	return i, err
 }
 
+const getProjectByOrgIDAndSlug = `-- name: GetProjectByOrgIDAndSlug :one
+SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE org_id = ? AND slug = ? AND deleted = false LIMIT 1
+`
+
+type GetProjectByOrgIDAndSlugParams struct {
+	OrgID int64  `json:"org_id"`
+	Slug  string `json:"slug"`
+}
+
+func (q *Queries) GetProjectByOrgIDAndSlug(ctx context.Context, arg GetProjectByOrgIDAndSlugParams) (Project, error) {
+	row := q.db.QueryRowContext(ctx, getProjectByOrgIDAndSlug, arg.OrgID, arg.Slug)
+	var i Project
+	err := row.Scan(
+		&i.ID,
+		&i.OrgID,
+		&i.Slug,
+		&i.Name,
+		&i.Description,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.Deleted,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const listProjectsByOrgId = `-- name: ListProjectsByOrgId :many
 SELECT id, org_id, slug, name, description, created_at, updated_at, deleted, deleted_at FROM projects WHERE org_id = ? AND deleted = false ORDER BY id
 `
